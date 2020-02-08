@@ -84,6 +84,8 @@ cc_library {
         // b/133140750 Clean this up. This is due to the dependency from libplatform_library_jni,
         // librs_jni, libjni_legacymosaic, etc.
         "//apex_available:platform",
+        // b/133140750 Clean this up, or allow this library to everywhere
+        "com.android.bluetooth.updatable",
     ],
 }
 
