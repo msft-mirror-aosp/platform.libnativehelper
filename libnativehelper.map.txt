@@ -13,7 +13,6 @@ LIBNATIVEHELPER_1 {
     jniThrowNullPointerException;
     jniThrowRuntimeException;
     jniThrowIOException;
-    jniStrError;
     jniCreateFileDescriptor;
     jniGetFDFromFileDescriptor;
     jniSetFileDescriptorOfFD;
