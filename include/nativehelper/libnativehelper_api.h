@@ -86,14 +86,6 @@ int jniThrowRuntimeException(C_JNIEnv* env, const char* msg);
 int jniThrowIOException(C_JNIEnv* env, int errnum);
 
 /*
- * Return a pointer to a locale-dependent error string explaining errno
- * value 'errnum'. The returned pointer may or may not be equal to 'buf'.
- * This function is thread-safe (unlike strerror) and portable (unlike
- * strerror_r).
- */
-const char* jniStrError(int errnum, char* buf, size_t buflen);
-
-/*
  * Returns a new java.io.FileDescriptor for the given int fd.
  */
 jobject jniCreateFileDescriptor(C_JNIEnv* env, int fd);
