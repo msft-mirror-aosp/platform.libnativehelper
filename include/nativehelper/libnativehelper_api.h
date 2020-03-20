@@ -160,6 +160,15 @@ jobject jniGetReferent(C_JNIEnv* env, jobject ref);
 jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len);
 
 /*
+ * Allocates a new array for java/lang/String instances with space for |count| elements. Elements
+ * are initially null.
+ *
+ * Returns a new array on success or nullptr in case of failure. This method raises an
+ * OutOfMemoryError exception if allocation fails.
+ */
+jobjectArray jniCreateStringArray(JNIEnv* env, size_t count);
+
+/*
  * Log a message and an exception.
  * If exception is NULL, logs the current exception in the JNI environment.
  */
@@ -229,15 +238,6 @@ void JniInvocationDestroy(struct JniInvocationImpl* instance);
 const char* JniInvocationGetLibrary(const char* library, char* buffer);
 
 /* ---------------------------------- C API for toStringArray.h --------------------------------- */
-
-/*
- * Allocates a new array for java/lang/String instances with space for |count| elements. Elements
- * are initially null.
- *
- * Returns a new array on success or nullptr in case of failure. This method raises an
- * OutOfMemoryError exception if allocation fails.
- */
-jobjectArray newStringArray(JNIEnv* env, size_t count);
 
 /*
  * Converts an array of C strings into a managed array of Java strings. The size of the C array is
