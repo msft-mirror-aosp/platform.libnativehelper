@@ -25,45 +25,38 @@
 #include <vector>
 #include "ScopedLocalRef.h"
 
-template <typename Counter, typename Getter>
-jobjectArray toStringArray(JNIEnv* env, Counter* counter, Getter* getter) {
-    size_t count = (*counter)();
-    jobjectArray result = newStringArray(env, count);
-    if (result == NULL) {
-        return NULL;
+template <typename StringVisitor>
+jobjectArray toStringArray(JNIEnv* env, size_t count, StringVisitor&& visitor) {
+    jobjectArray result = jniCreateStringArray(env, count);
+    if (result == nullptr) {
+        return nullptr;
     }
     for (size_t i = 0; i < count; ++i) {
-        ScopedLocalRef<jstring> s(env, env->NewStringUTF((*getter)(i)));
+        ScopedLocalRef<jstring> s(env, env->NewStringUTF(visitor(i)));
         if (env->ExceptionCheck()) {
-            return NULL;
+            return nullptr;
         }
         env->SetObjectArrayElement(result, i, s.get());
         if (env->ExceptionCheck()) {
-            return NULL;
+            return nullptr;
         }
     }
     return result;
 }
 
-struct VectorCounter {
-    const std::vector<std::string>& strings;
-    explicit VectorCounter(const std::vector<std::string>& strings) : strings(strings) {}
-    size_t operator()() {
-        return strings.size();
-    }
-};
-struct VectorGetter {
-    const std::vector<std::string>& strings;
-    explicit VectorGetter(const std::vector<std::string>& strings) : strings(strings) {}
-    const char* operator()(size_t i) {
-        return strings[i].c_str();
-    }
-};
-
 inline jobjectArray toStringArray(JNIEnv* env, const std::vector<std::string>& strings) {
-    VectorCounter counter(strings);
-    VectorGetter getter(strings);
-    return toStringArray<VectorCounter, VectorGetter>(env, &counter, &getter);
+    return toStringArray(env, strings.size(), [&strings](size_t i) { return strings[i].c_str(); });
+}
+
+inline jobjectArray toStringArray(JNIEnv* env, const char* const* strings) {
+    size_t count = 0;
+    for (; strings[count] != nullptr; ++count) {}
+    return toStringArray(env, count, [&strings](size_t i) { return strings[i]; });
+}
+
+template <typename Counter, typename Getter>
+jobjectArray toStringArray(JNIEnv* env, Counter* counter, Getter* getter) {
+    return toStringArray(env, counter(), [getter](size_t i) { return getter(i); });
 }
 
 #endif  // __cplusplus

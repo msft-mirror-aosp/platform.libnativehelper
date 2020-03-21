@@ -408,6 +408,10 @@ jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len) {
     return e->NewString(unicodeChars, len);
 }
 
+jobjectArray jniCreateStringArray(JNIEnv* env, size_t count) {
+    return env->NewObjectArray(count, JniConstants::GetStringClass(env), nullptr);
+}
+
 void jniUninitializeConstants() {
   JniConstants::Uninitialize();
 }
