@@ -26,100 +26,55 @@
 
 #include "jni.h"
 #include "JniConstants.h"
+#include "nativehelper/scoped_local_ref.h"
 
 namespace {
-
-/**
- * Equivalent to ScopedLocalRef, but for C_JNIEnv instead. (And slightly more powerful.)
- */
-template<typename T>
-class scoped_local_ref final {
-public:
-    explicit scoped_local_ref(C_JNIEnv* env, T localRef = NULL)
-    : mEnv(env), mLocalRef(localRef)
-    {
-    }
-
-    ~scoped_local_ref() {
-        reset();
-    }
-
-    void reset(T localRef = NULL) {
-        if (mLocalRef != NULL) {
-            (*mEnv)->DeleteLocalRef(reinterpret_cast<JNIEnv*>(mEnv), mLocalRef);
-            mLocalRef = localRef;
-        }
-    }
-
-    T get() const {
-        return mLocalRef;
-    }
-
-private:
-    // scoped_local_ref does not support copy or move semantics.
-    scoped_local_ref(const scoped_local_ref&) = delete;
-    scoped_local_ref(scoped_local_ref&&) = delete;
-    scoped_local_ref& operator=(const scoped_local_ref&) = delete;
-    scoped_local_ref& operator=(scoped_local_ref&&) = delete;
-
-private:
-    C_JNIEnv* const mEnv;
-    T mLocalRef;
-};
-
-jclass findClass(C_JNIEnv* env, const char* className) {
-    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
-    return (*env)->FindClass(e, className);
-}
 
 /*
  * Returns a human-readable summary of an exception object.  The buffer will
  * be populated with the "binary" class name and, if present, the
  * exception message.
  */
-bool getExceptionSummary(C_JNIEnv* env, jthrowable exception, std::string& result) {
-    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
-
-    /* get the name of the exception's class */
-    scoped_local_ref<jclass> exceptionClass(env, (*env)->GetObjectClass(e, exception)); // can't fail
-    scoped_local_ref<jclass> classClass(env,
-            (*env)->GetObjectClass(e, exceptionClass.get())); // java.lang.Class, can't fail
-    jmethodID classGetNameMethod =
-            (*env)->GetMethodID(e, classClass.get(), "getName", "()Ljava/lang/String;");
-    scoped_local_ref<jstring> classNameStr(env,
-            (jstring) (*env)->CallObjectMethod(e, exceptionClass.get(), classGetNameMethod));
-    if (classNameStr.get() == NULL) {
-        (*env)->ExceptionClear(e);
+bool getExceptionSummary(JNIEnv* e, jthrowable exception, std::string& result) {
+    // Get the name of the exception's class.
+    ScopedLocalRef<jclass> exceptionClass(e, e->GetObjectClass(exception)); // can't fail
+    ScopedLocalRef<jclass> classClass(e,      e->GetObjectClass(exceptionClass.get())); // j.l.Class, can't fail
+    jmethodID classGetNameMethod = e->GetMethodID( classClass.get(), "getName",
+                                                   "()Ljava/lang/String;");
+    ScopedLocalRef<jstring> classNameStr(e,
+            (jstring) e->CallObjectMethod(exceptionClass.get(), classGetNameMethod));
+    if (classNameStr.get() == nullptr) {
+        e->ExceptionClear();
         result = "<error getting class name>";
         return false;
     }
-    const char* classNameChars = (*env)->GetStringUTFChars(e, classNameStr.get(), NULL);
-    if (classNameChars == NULL) {
-        (*env)->ExceptionClear(e);
+    const char* classNameChars = e->GetStringUTFChars(classNameStr.get(), nullptr);
+    if (classNameChars == nullptr) {
+        e->ExceptionClear();
         result = "<error getting class name UTF-8>";
         return false;
     }
     result += classNameChars;
-    (*env)->ReleaseStringUTFChars(e, classNameStr.get(), classNameChars);
+    e->ReleaseStringUTFChars(classNameStr.get(), classNameChars);
 
     /* if the exception has a detail message, get that */
     jmethodID getMessage =
-            (*env)->GetMethodID(e, exceptionClass.get(), "getMessage", "()Ljava/lang/String;");
-    scoped_local_ref<jstring> messageStr(env,
-            (jstring) (*env)->CallObjectMethod(e, exception, getMessage));
-    if (messageStr.get() == NULL) {
+        e->GetMethodID(exceptionClass.get(), "getMessage", "()Ljava/lang/String;");
+    ScopedLocalRef<jstring> messageStr(e,
+            (jstring) e->CallObjectMethod(exception, getMessage));
+    if (messageStr.get() == nullptr) {
         return true;
     }
 
     result += ": ";
 
-    const char* messageChars = (*env)->GetStringUTFChars(e, messageStr.get(), NULL);
-    if (messageChars != NULL) {
+    const char* messageChars = e->GetStringUTFChars(messageStr.get(), nullptr);
+    if (messageChars != nullptr) {
         result += messageChars;
-        (*env)->ReleaseStringUTFChars(e, messageStr.get(), messageChars);
+        e->ReleaseStringUTFChars(messageStr.get(), messageChars);
     } else {
         result += "<error getting message>";
-        (*env)->ExceptionClear(e); // clear OOM
+        e->ExceptionClear(); // clear OOM
     }
 
     return true;
@@ -128,87 +83,83 @@ bool getExceptionSummary(C_JNIEnv* env, jthrowable exception, std::string& resul
 /*
  * Returns an exception (with stack trace) as a string.
  */
-bool getStackTrace(C_JNIEnv* env, jthrowable exception, std::string& result) {
-    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
-
-    scoped_local_ref<jclass> stringWriterClass(env, findClass(env, "java/io/StringWriter"));
-    if (stringWriterClass.get() == NULL) {
+bool getStackTrace(JNIEnv* e, jthrowable exception, std::string& result) {
+    ScopedLocalRef<jclass> stringWriterClass(e, e->FindClass("java/io/StringWriter"));
+    if (stringWriterClass.get() == nullptr) {
         return false;
     }
 
-    jmethodID stringWriterCtor = (*env)->GetMethodID(e, stringWriterClass.get(), "<init>", "()V");
+    jmethodID stringWriterCtor = e->GetMethodID(stringWriterClass.get(), "<init>", "()V");
     jmethodID stringWriterToStringMethod =
-            (*env)->GetMethodID(e, stringWriterClass.get(), "toString", "()Ljava/lang/String;");
+        e->GetMethodID(stringWriterClass.get(), "toString", "()Ljava/lang/String;");
 
-    scoped_local_ref<jclass> printWriterClass(env, findClass(env, "java/io/PrintWriter"));
-    if (printWriterClass.get() == NULL) {
+    ScopedLocalRef<jclass> printWriterClass(e, e->FindClass("java/io/PrintWriter"));
+    if (printWriterClass.get() == nullptr) {
         return false;
     }
 
     jmethodID printWriterCtor =
-            (*env)->GetMethodID(e, printWriterClass.get(), "<init>", "(Ljava/io/Writer;)V");
+            e->GetMethodID(printWriterClass.get(), "<init>", "(Ljava/io/Writer;)V");
 
-    scoped_local_ref<jobject> stringWriter(env,
-            (*env)->NewObject(e, stringWriterClass.get(), stringWriterCtor));
-    if (stringWriter.get() == NULL) {
+    ScopedLocalRef<jobject> stringWriter(e,
+            e->NewObject(stringWriterClass.get(), stringWriterCtor));
+    if (stringWriter.get() == nullptr) {
         return false;
     }
 
-    scoped_local_ref<jobject> printWriter(env,
-            (*env)->NewObject(e, printWriterClass.get(), printWriterCtor, stringWriter.get()));
-    if (printWriter.get() == NULL) {
+    ScopedLocalRef<jobject> printWriter(e,
+            e->NewObject(printWriterClass.get(), printWriterCtor, stringWriter.get()));
+    if (printWriter.get() == nullptr) {
         return false;
     }
 
-    scoped_local_ref<jclass> exceptionClass(env, (*env)->GetObjectClass(e, exception)); // can't fail
+    ScopedLocalRef<jclass> exceptionClass(e, e->GetObjectClass(exception)); // can't fail
     jmethodID printStackTraceMethod =
-            (*env)->GetMethodID(e, exceptionClass.get(), "printStackTrace", "(Ljava/io/PrintWriter;)V");
-    (*env)->CallVoidMethod(e, exception, printStackTraceMethod, printWriter.get());
+            e->GetMethodID(exceptionClass.get(), "printStackTrace", "(Ljava/io/PrintWriter;)V");
+    e->CallVoidMethod(exception, printStackTraceMethod, printWriter.get());
 
-    if ((*env)->ExceptionCheck(e)) {
+    if (e->ExceptionCheck()) {
         return false;
     }
 
-    scoped_local_ref<jstring> messageStr(env,
-            (jstring) (*env)->CallObjectMethod(e, stringWriter.get(), stringWriterToStringMethod));
-    if (messageStr.get() == NULL) {
+    ScopedLocalRef<jstring> messageStr(e,
+            (jstring) e->CallObjectMethod(stringWriter.get(), stringWriterToStringMethod));
+    if (messageStr.get() == nullptr) {
         return false;
     }
 
-    const char* utfChars = (*env)->GetStringUTFChars(e, messageStr.get(), NULL);
-    if (utfChars == NULL) {
+    const char* utfChars = e->GetStringUTFChars( messageStr.get(), nullptr);
+    if (utfChars == nullptr) {
         return false;
     }
 
     result = utfChars;
 
-    (*env)->ReleaseStringUTFChars(e, messageStr.get(), utfChars);
+    e->ReleaseStringUTFChars(messageStr.get(), utfChars);
     return true;
 }
 
-std::string jniGetStackTrace(C_JNIEnv* env, jthrowable exception) {
-    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
-
-    scoped_local_ref<jthrowable> currentException(env, (*env)->ExceptionOccurred(e));
-    if (exception == NULL) {
+std::string jniGetStackTrace(JNIEnv* e, jthrowable exception) {
+    ScopedLocalRef<jthrowable> currentException(e, e->ExceptionOccurred());
+    if (exception == nullptr) {
         exception = currentException.get();
-        if (exception == NULL) {
+        if (exception == nullptr) {
           return "<no pending exception>";
         }
     }
 
-    if (currentException.get() != NULL) {
-        (*env)->ExceptionClear(e);
+    if (currentException.get() != nullptr) {
+        e->ExceptionClear();
     }
 
     std::string trace;
-    if (!getStackTrace(env, exception, trace)) {
-        (*env)->ExceptionClear(e);
-        getExceptionSummary(env, exception, trace);
+    if (!getStackTrace(e, exception, trace)) {
+        e->ExceptionClear();
+        getExceptionSummary(e, exception, trace);
     }
 
-    if (currentException.get() != NULL) {
-        (*env)->Throw(e, currentException.get()); // rethrow
+    if (currentException.get() != nullptr) {
+        e->Throw(currentException.get()); // re-throw
     }
 
     return trace;
@@ -257,8 +208,8 @@ int jniRegisterNativeMethods(C_JNIEnv* env, const char* className,
 
     ALOGV("Registering %s's %d native methods...", className, numMethods);
 
-    scoped_local_ref<jclass> c(env, findClass(env, className));
-    ALOG_ALWAYS_FATAL_IF(c.get() == NULL,
+    ScopedLocalRef<jclass> c(e, e->FindClass(className));
+    ALOG_ALWAYS_FATAL_IF(c.get() == nullptr,
                          "Native registration unable to find class '%s'; aborting...",
                          className);
 
@@ -272,26 +223,26 @@ int jniRegisterNativeMethods(C_JNIEnv* env, const char* className,
 int jniThrowException(C_JNIEnv* env, const char* className, const char* msg) {
     JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
 
-    if ((*env)->ExceptionCheck(e)) {
+    if (e->ExceptionCheck()) {
         /* TODO: consider creating the new exception with this as "cause" */
-        scoped_local_ref<jthrowable> exception(env, (*env)->ExceptionOccurred(e));
-        (*env)->ExceptionClear(e);
+        ScopedLocalRef<jthrowable> exception(e, e->ExceptionOccurred());
+        e->ExceptionClear();
 
-        if (exception.get() != NULL) {
+        if (exception.get() != nullptr) {
             std::string text;
-            getExceptionSummary(env, exception.get(), text);
+            getExceptionSummary(e, exception.get(), text);
             ALOGW("Discarding pending exception (%s) to throw %s", text.c_str(), className);
         }
     }
 
-    scoped_local_ref<jclass> exceptionClass(env, findClass(env, className));
-    if (exceptionClass.get() == NULL) {
+    ScopedLocalRef<jclass> exceptionClass(e, e->FindClass(className));
+    if (exceptionClass.get() == nullptr) {
         ALOGE("Unable to find exception class %s", className);
         /* ClassNotFoundException now pending */
         return -1;
     }
 
-    if ((*env)->ThrowNew(e, exceptionClass.get(), msg) != JNI_OK) {
+    if (e->ThrowNew(exceptionClass.get(), msg) != JNI_OK) {
         ALOGE("Failed throwing '%s' '%s'", className, msg);
         /* an exception, most likely OOM, will now be pending */
         return -1;
@@ -321,7 +272,8 @@ int jniThrowIOException(C_JNIEnv* env, int errnum) {
 }
 
 void jniLogException(C_JNIEnv* env, int priority, const char* tag, jthrowable exception) {
-    std::string trace(jniGetStackTrace(env, exception));
+    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
+    std::string trace(jniGetStackTrace(e, exception));
     __android_log_write(priority, tag, trace.c_str());
 }
 
@@ -408,8 +360,9 @@ jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len) {
     return e->NewString(unicodeChars, len);
 }
 
-jobjectArray jniCreateStringArray(JNIEnv* env, size_t count) {
-    return env->NewObjectArray(count, JniConstants::GetStringClass(env), nullptr);
+jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count) {
+    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
+    return e->NewObjectArray(count, JniConstants::GetStringClass(e), nullptr);
 }
 
 void jniUninitializeConstants() {
