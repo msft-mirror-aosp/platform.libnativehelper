@@ -166,7 +166,7 @@ jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len);
  * Returns a new array on success or nullptr in case of failure. This method raises an
  * OutOfMemoryError exception if allocation fails.
  */
-jobjectArray jniCreateStringArray(JNIEnv* env, size_t count);
+jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count);
 
 /*
  * Log a message and an exception.
@@ -236,17 +236,6 @@ void JniInvocationDestroy(struct JniInvocationImpl* instance);
  * "libart.so".
  */
 const char* JniInvocationGetLibrary(const char* library, char* buffer);
-
-/* ---------------------------------- C API for toStringArray.h --------------------------------- */
-
-/*
- * Converts an array of C strings into a managed array of Java strings. The size of the C array is
- * determined by the presence of a final element containing a nullptr.
- *
- * Returns a new array on success or nullptr in case of failure. This method raises an
- * OutOfMemoryError exception if allocation fails.
- */
-jobjectArray toStringArray(JNIEnv* env, const char* const* strings);
 
 #ifdef __cplusplus
 }

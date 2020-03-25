@@ -27,7 +27,7 @@
 
 template <typename StringVisitor>
 jobjectArray toStringArray(JNIEnv* env, size_t count, StringVisitor&& visitor) {
-    jobjectArray result = jniCreateStringArray(env, count);
+    jobjectArray result = jniCreateStringArray(static_cast<C_JNIEnv*>(&env->functions), count);
     if (result == nullptr) {
         return nullptr;
     }
