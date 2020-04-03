@@ -16,12 +16,18 @@ cc_library_headers {
     name: "jni_headers",
     host_supported: true,
     export_include_dirs: ["include_jni"],
+    native_bridge_supported: true,
     vendor_available: true,
     target: {
         windows: {
             enabled: true,
         },
     },
+    apex_available: [
+        "//apex_available:platform",
+        "//apex_available:anyapex",
+    ],
+    visibility: ["//visibility:public"],
     // The minimum sdk version required by users of this module.
     sdk_version: "minimum",
 }
