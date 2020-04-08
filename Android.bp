@@ -28,6 +28,8 @@ cc_library_headers {
         "//apex_available:anyapex",
     ],
     visibility: ["//visibility:public"],
+    stl: "none",
+    system_shared_libs: [],
     // The minimum sdk version required by users of this module.
     sdk_version: "minimum",
 }
@@ -35,7 +37,11 @@ cc_library_headers {
 cc_library_headers {
     name: "libnativehelper_header_only",
     host_supported: true,
-    export_include_dirs: ["header_only_include"],
+    export_include_dirs: [
+        "header_only_include",
+    ],
+    header_libs: ["jni_headers"],
+    export_header_lib_headers: ["jni_headers"],
     target: {
         windows: {
             enabled: true,
@@ -47,7 +53,11 @@ cc_library_headers {
 cc_library_headers {
     name: "jni_platform_headers",
     host_supported: true,
-    export_include_dirs: ["platform_include"],
+    export_include_dirs: [
+        "platform_include",
+    ],
+    header_libs: ["jni_headers"],
+    export_header_lib_headers: ["jni_headers"],
     target: {
         windows: {
             enabled: true,
@@ -69,10 +79,12 @@ cc_library {
         "-fvisibility=protected",
     ],
     export_include_dirs: [
-        "include",
         "header_only_include",
+        "include",
         "platform_include",
     ],
+    header_libs: ["jni_headers"],
+    export_header_lib_headers: ["jni_headers"],
     stubs: {
         symbol_file: "libnativehelper.map.txt",
         versions: ["1"],
@@ -102,11 +114,13 @@ cc_library {
 
 cc_library_shared {
     name: "libnativehelper_compat_libc++",
+    header_libs: ["jni_headers"],
+    cflags: ["-Werror"],
+    export_header_lib_headers: ["jni_headers"],
     export_include_dirs: [
         "header_only_include",
         "include",
     ],
-    cflags: ["-Werror"],
     local_include_dirs: [
         "header_only_include",
         "platform_include",
