@@ -102,11 +102,6 @@ int jniGetFDFromFileDescriptor(C_JNIEnv* env, jobject fileDescriptor);
 void jniSetFileDescriptorOfFD(C_JNIEnv* env, jobject fileDescriptor, int value);
 
 /*
- * Returns the long ownerId from a java.io.FileDescriptor.
- */
-jlong jniGetOwnerIdFromFileDescriptor(C_JNIEnv* env, jobject fileDescriptor);
-
-/*
  * Gets the managed heap array backing a java.nio.Buffer instance.
  *
  * Returns nullptr if there is no array backing.

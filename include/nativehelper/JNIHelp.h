@@ -81,10 +81,6 @@ inline void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int va
     jniSetFileDescriptorOfFD(&env->functions, fileDescriptor, value);
 }
 
-inline jlong jniGetOwnerIdFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    return jniGetOwnerIdFromFileDescriptor(&env->functions, fileDescriptor);
-}
-
 inline jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
     return jniGetNioBufferBaseArray(&env->functions, nioBuffer);
 }

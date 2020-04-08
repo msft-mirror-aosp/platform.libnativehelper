@@ -308,11 +308,6 @@ void jniSetFileDescriptorOfFD(C_JNIEnv* env, jobject fileDescriptor, int value) 
     }
 }
 
-jlong jniGetOwnerIdFromFileDescriptor(C_JNIEnv* env, jobject fileDescriptor) {
-    JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
-    return e->GetLongField(fileDescriptor, JniConstants::GetFileDescriptorOwnerIdField(e));
-}
-
 jarray jniGetNioBufferBaseArray(C_JNIEnv* env, jobject nioBuffer) {
     JNIEnv* e = reinterpret_cast<JNIEnv*>(env);
     jclass nioAccessClass = JniConstants::GetNioAccessClass(e);
