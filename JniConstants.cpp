@@ -70,7 +70,6 @@ jclass g_string_class = nullptr;           // java.lang.String
 // under the protection of the |g_class_refs_mutex|.
 
 jfieldID g_file_descriptor_descriptor_field = nullptr;  // java.io.FileDescriptor.descriptor
-jfieldID g_file_descriptor_owner_id_field = nullptr;    // java.io.FileDescriptor.ownerId
 jmethodID g_file_descriptor_init_method = nullptr;      // void java.io.FileDescriptor.<init>()
 jmethodID g_nio_access_get_base_array_method = nullptr;        // Object java.nio.NIOAccess.getBaseArray()
 jmethodID g_nio_access_get_base_array_offset_method = nullptr; // Object java.nio.NIOAccess.getBaseArray()
@@ -139,14 +138,6 @@ jfieldID JniConstants::GetFileDescriptorDescriptorField(JNIEnv* env) {
         g_file_descriptor_descriptor_field = FindField(env, klass, "descriptor", "I");
     }
     return g_file_descriptor_descriptor_field;
-}
-
-jfieldID JniConstants::GetFileDescriptorOwnerIdField(JNIEnv* env) {
-    if (g_file_descriptor_owner_id_field == nullptr) {
-        jclass klass = GetFileDescriptorClass(env);
-        g_file_descriptor_owner_id_field = FindField(env, klass, "ownerId", "J");
-    }
-    return g_file_descriptor_owner_id_field;
 }
 
 jmethodID JniConstants::GetFileDescriptorInitMethod(JNIEnv* env) {
@@ -268,7 +259,6 @@ void JniConstants::Uninitialize() {
     std::lock_guard<std::mutex> guard(g_class_refs_mutex);
     g_file_descriptor_class = nullptr;
     g_file_descriptor_descriptor_field = nullptr;
-    g_file_descriptor_owner_id_field = nullptr;
     g_file_descriptor_init_method = nullptr;
     g_nio_access_class = nullptr;
     g_nio_access_get_base_array_method = nullptr;

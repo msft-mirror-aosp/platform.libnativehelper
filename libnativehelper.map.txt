@@ -16,7 +16,6 @@ LIBNATIVEHELPER_1 {
     jniCreateFileDescriptor;
     jniGetFDFromFileDescriptor;
     jniSetFileDescriptorOfFD;
-    jniGetOwnerIdFromFileDescriptor;
     jniGetNioBufferBaseArray;
     jniGetNioBufferBaseArrayOffset;
     jniGetNioBufferPointer;
