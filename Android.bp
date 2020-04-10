@@ -27,6 +27,8 @@ cc_library_headers {
         "//apex_available:platform",
         "//apex_available:anyapex",
     ],
+    // recovery_available currently required for libchome (https://r.android.com/799940).
+    recovery_available: true,
     visibility: ["//visibility:public"],
     stl: "none",
     system_shared_libs: [],
