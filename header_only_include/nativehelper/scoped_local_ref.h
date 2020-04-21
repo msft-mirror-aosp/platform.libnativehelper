@@ -19,7 +19,8 @@
 
 #include <cstddef>
 
-#include "jni.h"
+#include <jni.h>
+
 #include "nativehelper_utils.h"
 
 // A smart pointer that deletes a JNI local reference when it goes out of scope.
@@ -39,9 +40,9 @@ public:
         reset();
     }
 
-    void reset(T ptr = NULL) {
+    void reset(T ptr = nullptr) {
         if (ptr != mLocalRef) {
-            if (mLocalRef != NULL) {
+            if (mLocalRef != nullptr) {
                 mEnv->DeleteLocalRef(mLocalRef);
             }
             mLocalRef = ptr;
@@ -50,7 +51,7 @@ public:
 
     T release() __attribute__((warn_unused_result)) {
         T localRef = mLocalRef;
-        mLocalRef = NULL;
+        mLocalRef = nullptr;
         return localRef;
     }
 
