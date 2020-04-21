@@ -17,7 +17,8 @@
 #ifndef LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_BYTES_H_
 #define LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_BYTES_H_
 
-#include "jni.h"
+#include <jni.h>
+
 #include "nativehelper_utils.h"
 
 /**
@@ -30,15 +31,15 @@ template<bool readOnly>
 class ScopedBytes {
 public:
     ScopedBytes(JNIEnv* env, jobject object)
-    : mEnv(env), mObject(object), mByteArray(NULL), mPtr(NULL)
+    : mEnv(env), mObject(object), mByteArray(nullptr), mPtr(nullptr)
     {
-        if (mObject == NULL) {
+        if (mObject == nullptr) {
             jniThrowNullPointerException(mEnv);
         } else {
             jclass byteArrayClass = env->FindClass("[B");
             if (mEnv->IsInstanceOf(mObject, byteArrayClass)) {
                 mByteArray = reinterpret_cast<jbyteArray>(mObject);
-                mPtr = mEnv->GetByteArrayElements(mByteArray, NULL);
+                mPtr = mEnv->GetByteArrayElements(mByteArray, nullptr);
             } else {
                 mPtr = reinterpret_cast<jbyte*>(mEnv->GetDirectBufferAddress(mObject));
             }
@@ -47,7 +48,7 @@ public:
     }
 
     ~ScopedBytes() {
-        if (mByteArray != NULL) {
+        if (mByteArray != nullptr) {
             mEnv->ReleaseByteArrayElements(mByteArray, mPtr, readOnly ? JNI_ABORT : 0);
         }
     }

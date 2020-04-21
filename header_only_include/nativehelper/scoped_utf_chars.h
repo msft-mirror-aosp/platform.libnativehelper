@@ -17,9 +17,11 @@
 #ifndef LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_
 #define LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_
 
+#include <stddef.h>
 #include <string.h>
 
-#include "jni.h"
+#include <jni.h>
+
 #include "nativehelper_utils.h"
 
 // A smart pointer that provides read-only access to a Java string's UTF chars.

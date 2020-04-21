@@ -15,6 +15,23 @@ cc_test {
     shared_libs: ["libnativehelper"],
 }
 
+cc_binary {
+    name: "libnativehelper_header_only_test",
+    host_supported: true,
+    cflags: [
+        "-Wall",
+        "-Werror",
+    ],
+    srcs: [
+        "scoped_bytes_test.cpp",
+        "scoped_local_frame_test.cpp",
+        "scoped_local_ref_test.cpp",
+        "scoped_primitive_array_test.cpp",
+        "scoped_test.cpp",
+    ],
+    header_libs: ["libnativehelper_header_only"],
+}
+
 cc_test {
     name: "JniSafeRegisterNativeMethods_test",
     host_supported: true,
