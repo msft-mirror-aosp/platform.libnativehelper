@@ -17,7 +17,8 @@
 #ifndef LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_LOCAL_FRAME_H_
 #define LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_LOCAL_FRAME_H_
 
-#include "jni.h"
+#include <jni.h>
+
 #include "nativehelper_utils.h"
 
 class ScopedLocalFrame {
@@ -27,7 +28,7 @@ public:
     }
 
     ~ScopedLocalFrame() {
-        mEnv->PopLocalFrame(NULL);
+        mEnv->PopLocalFrame(nullptr);
     }
 
 private:
