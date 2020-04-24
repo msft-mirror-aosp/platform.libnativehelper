@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef LIBNATIVEHELPER_ALOG_PRIV_H_
-#define LIBNATIVEHELPER_ALOG_PRIV_H_
+#pragma once
 
 #include <android/log.h>
 
@@ -35,8 +34,8 @@
  */
 
 #ifndef ALOG
-#define ALOG(priority, tag, fmt...) \
-    __android_log_print(ANDROID_##priority, tag, fmt)
+#define ALOG(priority, tag, fmt, ...) \
+    __android_log_print(ANDROID_##priority, tag, fmt, __VA_ARGS__)
 #endif
 
 #ifndef ALOGV
@@ -73,4 +72,3 @@
     if (cond) __android_log_assert(#cond, LOG_TAG, __VA_ARGS__)
 #endif
 
-#endif  // LIBNATIVEHELPER_ALOG_PRIV_H_

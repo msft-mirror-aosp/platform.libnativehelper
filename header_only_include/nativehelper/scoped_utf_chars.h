@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_
-#define LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_
+#pragma once
 
 #include <stddef.h>
 #include <string.h>
@@ -93,4 +92,3 @@ class ScopedUtfChars {
   DISALLOW_COPY_AND_ASSIGN(ScopedUtfChars);
 };
 
-#endif  // LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_

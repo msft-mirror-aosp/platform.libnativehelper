@@ -18,10 +18,6 @@ cc_test {
 cc_binary {
     name: "libnativehelper_header_only_test",
     host_supported: true,
-    cflags: [
-        "-Wall",
-        "-Werror",
-    ],
     srcs: [
         "scoped_bytes_test.cpp",
         "scoped_local_frame_test.cpp",
@@ -30,6 +26,18 @@ cc_binary {
         "scoped_test.cpp",
     ],
     header_libs: ["libnativehelper_header_only"],
+}
+
+cc_test {
+    name: "ExpandableString_test",
+    test_suites: ["device-tests"],
+    host_supported: true,
+    srcs: ["ExpandableString_test.cpp"],
+
+    // Link to the non-stub version of the library to access some internal
+    // functions.
+    bootstrap: true,
+    shared_libs: ["libnativehelper"],
 }
 
 cc_test {
@@ -87,10 +95,6 @@ cc_test {
 cc_test {
     name: "libnativehelper_api_test",
     host_supported: true,
-    cflags: [
-        "-Wall",
-        "-Werror",
-    ],
     srcs: ["libnativehelper_api_test.c"], // C Compilation test.
     tidy: true,
     shared_libs: ["libnativehelper"],
