@@ -2,6 +2,9 @@
   "presubmit": [
     {
       "name": "JniInvocation_test"
+    },
+    {
+      "name": "ExpandableString_test"
     }
   ]
 }

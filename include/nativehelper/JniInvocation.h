@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_JNIINVOCATION_H_
-#define LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_JNIINVOCATION_H_
+#pragma once
 
 #include "libnativehelper_api.h"
 
@@ -58,15 +57,7 @@ class JniInvocation final {
   JniInvocation(const JniInvocation&) = delete;
   JniInvocation& operator=(const JniInvocation&) = delete;
 
-  static const char* GetLibrary(const char* library, char* buffer, bool (*is_debuggable)(),
-                                int (*get_library_system_property)(char* buffer));
-
   JniInvocationImpl* impl_;
-
-  friend class JNIInvocation_Debuggable_Test;
-  friend class JNIInvocation_NonDebuggable_Test;
 };
 
 #endif  // __cplusplus
-
-#endif  // LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_JNIINVOCATION_H_
