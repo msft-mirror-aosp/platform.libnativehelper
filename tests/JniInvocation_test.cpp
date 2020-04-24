@@ -49,7 +49,7 @@ static int IsDebuggableNever() {
 
 static int GetPropertyForTest(char* buffer) {
     strcpy(buffer, kTestNonNull2);
-    return sizeof(kTestNonNull2);
+    return strlen(buffer);
 }
 
 #endif  // HAVE_TEST_STUFF

@@ -28,13 +28,13 @@ TEST(ExpandableString, InitializeAppendRelease) {
     struct ExpandableString s;
     ExpandableStringInitialize(&s);
     EXPECT_TRUE(s.data == NULL);
-    EXPECT_EQ(s.dataSize, 0);
+    EXPECT_EQ(s.dataSize, 0u);
     EXPECT_TRUE(ExpandableStringAppend(&s, kAhoy));
     EXPECT_TRUE(s.data != NULL);
     EXPECT_GE(s.dataSize, strlen(kAhoy));
     ExpandableStringRelease(&s);
     EXPECT_TRUE(s.data == NULL);
-    EXPECT_GE(s.dataSize, 0);
+    EXPECT_GE(s.dataSize, 0u);
 }
 
 TEST(ExpandableString, InitializeWriteRelease) {
@@ -44,7 +44,7 @@ TEST(ExpandableString, InitializeWriteRelease) {
     struct ExpandableString s;
     ExpandableStringInitialize(&s);
     EXPECT_TRUE(s.data == NULL);
-    EXPECT_EQ(s.dataSize, 0);
+    EXPECT_EQ(s.dataSize, 0u);
     EXPECT_TRUE(ExpandableStringAssign(&s, kAhoy));
     EXPECT_TRUE(s.data != NULL);
     EXPECT_GE(s.dataSize, strlen(kAhoy));
@@ -56,7 +56,7 @@ TEST(ExpandableString, InitializeWriteRelease) {
     EXPECT_GE(s.dataSize, strlen(kAhoy));
     ExpandableStringRelease(&s);
     EXPECT_TRUE(s.data == NULL);
-    EXPECT_GE(s.dataSize, 0);
+    EXPECT_GE(s.dataSize, 0u);
 }
 
 class ExpandableStringTestFixture : public :: testing::TestWithParam<size_t> {
@@ -76,17 +76,17 @@ TEST_P(ExpandableStringTestFixture, AppendTest) {
    for (size_t offset = 0; offset < step; ++offset) {
       ExpandableStringInitialize(&expandableString);
 
-      std::string pad(step - 1, '_');
+      std::string pad(step - 1u, '_');
       EXPECT_TRUE(ExpandableStringAppend(&expandableString, pad.c_str()));
 
-      for (size_t i = 0; i < 4096; ++i) {
+      for (size_t i = 0; i < 4096u; ++i) {
          const std::string& appendee = inputs[i % inputs.size()];
          EXPECT_TRUE(ExpandableStringAppend(&expandableString, appendee.c_str()));
-         size_t requiredSize = pad.size() + i * step + 1;
+         size_t requiredSize = pad.size() + i * step + 1u;
          EXPECT_GE(expandableString.dataSize, requiredSize);
       }
 
-      size_t position = 0;
+      size_t position = 0u;
       for (char c : pad) {
          EXPECT_EQ(c, expandableString.data[position]);
          position++;
