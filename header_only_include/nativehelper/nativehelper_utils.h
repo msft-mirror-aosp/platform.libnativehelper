@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_NATIVEHELPER_UTILS_H_
-#define LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_NATIVEHELPER_UTILS_H_
+#pragma once
 
 #include <jni.h>
 
@@ -52,4 +51,3 @@ static inline int jniThrowNullPointerException(JNIEnv* env) {
 
 #endif  // defined(__cplusplus)
 
-#endif  // LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_NATIVEHELPER_UTILS_H_

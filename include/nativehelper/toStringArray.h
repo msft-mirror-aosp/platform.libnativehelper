@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#ifndef LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_TOSTRINGARRAY_H_
-#define LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_TOSTRINGARRAY_H_
+#pragma once
 
 #include "libnativehelper_api.h"
 
@@ -61,4 +60,3 @@ jobjectArray toStringArray(JNIEnv* env, Counter* counter, Getter* getter) {
 
 #endif  // __cplusplus
 
-#endif  // LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_TOSTRINGARRAY_H_

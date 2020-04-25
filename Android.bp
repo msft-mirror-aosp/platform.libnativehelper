@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+cc_defaults {
+    name: "libnativehelper_defaults",
+    cflags: [
+        "-fvisibility=protected",
+        "-std=c11",
+    ],
+}
+
 cc_library_headers {
     name: "jni_headers",
     host_supported: true,
@@ -69,17 +77,16 @@ cc_library_headers {
 
 cc_library {
     name: "libnativehelper",
+    defaults: ["libnativehelper_defaults"],
     host_supported: true,
     srcs: [
-        "JNIHelp.cpp",
-        "JniConstants.cpp",
-        "JniInvocation.cpp",
+        "DlHelp.c",
+        "ExpandableString.c",
+        "JNIHelp.c",
+        "JniConstants.c",
+        "JniInvocation.c",
     ],
     shared_libs: ["liblog"],
-    cflags: [
-        "-Werror",
-        "-fvisibility=protected",
-    ],
     export_include_dirs: [
         "header_only_include",
         "include",
@@ -87,13 +94,13 @@ cc_library {
     ],
     header_libs: ["jni_headers"],
     export_header_lib_headers: ["jni_headers"],
+    stl: "none",
     stubs: {
         symbol_file: "libnativehelper.map.txt",
         versions: ["1"],
     },
     target: {
         windows: {
-            shared_libs: ["libbase"],
             enabled: true,
         },
     },
@@ -116,6 +123,7 @@ cc_library {
 
 cc_library_shared {
     name: "libnativehelper_compat_libc++",
+    defaults: ["libnativehelper_defaults"],
     header_libs: ["jni_headers"],
     cflags: ["-Werror"],
     export_header_lib_headers: ["jni_headers"],
@@ -128,14 +136,16 @@ cc_library_shared {
         "platform_include",
     ],
     srcs: [
-        "JNIHelp.cpp",
-        "JniConstants.cpp",
+        "DlHelp.c",
+        "ExpandableString.c",
+        "JNIHelp.c",
+        "JniConstants.c",
     ],
     shared_libs: [
         "liblog",
     ],
     sdk_version: "19",
-    stl: "c++_static",
+    stl: "none",
 }
 
 ndk_headers {
