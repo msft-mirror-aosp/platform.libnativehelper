@@ -14,6 +14,19 @@
  * limitations under the License.
  */
 
-int main() {
-  return 0;
-}
+#pragma once
+
+#include <sys/cdefs.h>
+#include <stdbool.h>
+
+__BEGIN_DECLS
+
+typedef void* DlLibrary;
+typedef void* DlSymbol;
+
+DlLibrary DlOpenLibrary(const char* filename);
+bool DlCloseLibrary(DlLibrary library);
+DlSymbol DlGetSymbol(DlLibrary library, const char* symbol);
+const char* DlGetError();
+
+__END_DECLS

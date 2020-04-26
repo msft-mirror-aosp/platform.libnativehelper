@@ -1,42 +1,23 @@
 // Build the unit tests.
 
+// b/154913134: JniInvocation_test is due to be phased out. Please
+// make any changes to both JniInvocation_test and
+// libnativehelper_tests below.
+
 cc_test {
     name: "JniInvocation_test",
     test_suites: ["device-tests"],
     host_supported: true,
-    srcs: ["JniInvocation_test.cpp"],
-    cflags: [
-        "-Wall",
-        "-Werror",
-    ],
-    // Link to the non-stub version of the library to access some internal
-    // functions.
-    bootstrap: true,
-    shared_libs: ["libnativehelper"],
-}
-
-cc_binary {
-    name: "libnativehelper_header_only_test",
-    host_supported: true,
-    cflags: [
-        "-Wall",
-        "-Werror",
-    ],
     srcs: [
         "scoped_bytes_test.cpp",
         "scoped_local_frame_test.cpp",
         "scoped_local_ref_test.cpp",
         "scoped_primitive_array_test.cpp",
-        "scoped_test.cpp",
+        "libnativehelper_api_test.c",
+        "ExpandableString_test.cpp",
+        "JniInvocation_test.cpp",
+        "JniSafeRegisterNativeMethods_test.cpp",
     ],
-    header_libs: ["libnativehelper_header_only"],
-}
-
-cc_test {
-    name: "JniSafeRegisterNativeMethods_test",
-    host_supported: true,
-    srcs: ["JniSafeRegisterNativeMethods_test.cpp"],
-
     cflags: [
         // Base set of cflags used by all things ART.
         "-fno-rtti",
@@ -71,6 +52,9 @@ cc_test {
         // Enable warning for deprecated language features.
         "-Wdeprecated",
 
+        // Disable warning from external/libcxxabi/include/cxxabi.h
+        "-Wno-deprecated-dynamic-exception-spec",
+
         // Enable warning for unreachable break & return.
         "-Wunreachable-code-break",
         "-Wunreachable-code-return",
@@ -78,20 +62,74 @@ cc_test {
         // Enable thread annotations for std::mutex, etc.
         "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
     ],
-
-    tidy: true,
-
+    // Link to the non-stub version of the library to access some internal
+    // functions.
+    bootstrap: true,
     shared_libs: ["libnativehelper"],
+    tidy: true,
 }
 
 cc_test {
-    name: "libnativehelper_api_test",
+    name: "libnativehelper_tests",
+    test_suites: ["device-tests"],
     host_supported: true,
+    srcs: [
+        "scoped_bytes_test.cpp",
+        "scoped_local_frame_test.cpp",
+        "scoped_local_ref_test.cpp",
+        "scoped_primitive_array_test.cpp",
+        "libnativehelper_api_test.c",
+        "ExpandableString_test.cpp",
+        "JniInvocation_test.cpp",
+        "JniSafeRegisterNativeMethods_test.cpp",
+    ],
     cflags: [
+        // Base set of cflags used by all things ART.
+        "-fno-rtti",
+        "-ggdb3",
         "-Wall",
         "-Werror",
+        "-Wextra",
+        "-Wstrict-aliasing",
+        "-fstrict-aliasing",
+        "-Wunreachable-code",
+        "-Wredundant-decls",
+        "-Wshadow",
+        "-Wunused",
+        "-fvisibility=protected",
+
+        // Warn about thread safety violations with clang.
+        "-Wthread-safety",
+        "-Wthread-safety-negative",
+
+        // Warn if switch fallthroughs aren't annotated.
+        "-Wimplicit-fallthrough",
+
+        // Enable float equality warnings.
+        "-Wfloat-equal",
+
+        // Enable warning of converting ints to void*.
+        "-Wint-to-void-pointer-cast",
+
+        // Enable warning of wrong unused annotations.
+        "-Wused-but-marked-unused",
+
+        // Enable warning for deprecated language features.
+        "-Wdeprecated",
+
+        // Disable warning from external/libcxxabi/include/cxxabi.h
+        "-Wno-deprecated-dynamic-exception-spec",
+
+        // Enable warning for unreachable break & return.
+        "-Wunreachable-code-break",
+        "-Wunreachable-code-return",
+
+        // Enable thread annotations for std::mutex, etc.
+        "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
     ],
-    srcs: ["libnativehelper_api_test.c"], // C Compilation test.
-    tidy: true,
+    // Link to the non-stub version of the library to access some internal
+    // functions.
+    bootstrap: true,
     shared_libs: ["libnativehelper"],
+    tidy: true,
 }

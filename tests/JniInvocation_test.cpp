@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "NativeBridge_test"
+#include "../JniInvocation-priv.h"
 
-#include <nativehelper/JniInvocation.h>
 #include <gtest/gtest.h>
-
 
 #include "string.h"
 
@@ -36,22 +34,31 @@
 #endif
 
 #ifdef HAVE_TEST_STUFF
+
 static const char* kTestNonNull = "libartd.so";
 static const char* kTestNonNull2 = "libartd2.so";
 static const char* kExpected = "libart.so";
-#endif
+
+static int IsDebuggableAlways() {
+    return 1;
+}
+
+static int IsDebuggableNever() {
+    return 0;
+}
+
+static int GetPropertyForTest(char* buffer) {
+    strcpy(buffer, kTestNonNull2);
+    return strlen(buffer);
+}
+
+#endif  // HAVE_TEST_STUFF
 
 TEST(JNIInvocation, Debuggable) {
 #ifdef HAVE_TEST_STUFF
-    auto is_debuggable = []() { return true; };
-    auto get_library_system_property = [](char* buffer) -> int {
-        strcpy(buffer, kTestNonNull2);
-        return sizeof(kTestNonNull2);
-    };
-
     char buffer[PROPERTY_VALUE_MAX];
     const char* result =
-        JniInvocation::GetLibrary(NULL, buffer, is_debuggable, get_library_system_property);
+        JniInvocationGetLibraryWith(NULL, buffer, IsDebuggableAlways, GetPropertyForTest);
     EXPECT_FALSE(result == NULL);
     if (result != NULL) {
         EXPECT_TRUE(strcmp(result, kTestNonNull2) == 0);
@@ -59,7 +66,7 @@ TEST(JNIInvocation, Debuggable) {
     }
 
     result =
-        JniInvocation::GetLibrary(kTestNonNull, buffer, is_debuggable, get_library_system_property);
+        JniInvocationGetLibraryWith(kTestNonNull, buffer, IsDebuggableAlways, GetPropertyForTest);
     EXPECT_FALSE(result == NULL);
     if (result != NULL) {
         EXPECT_TRUE(strcmp(result, kTestNonNull) == 0);
@@ -72,10 +79,8 @@ TEST(JNIInvocation, Debuggable) {
 
 TEST(JNIInvocation, NonDebuggable) {
 #ifdef HAVE_TEST_STUFF
-    auto is_debuggable = []() { return false; };
-
     char buffer[PROPERTY_VALUE_MAX];
-    const char* result = JniInvocation::GetLibrary(NULL, buffer, is_debuggable, nullptr);
+    const char* result = JniInvocationGetLibraryWith(NULL, buffer, IsDebuggableNever, nullptr);
     EXPECT_FALSE(result == NULL);
     if (result != NULL) {
         EXPECT_TRUE(strcmp(result, kExpected) == 0);
@@ -83,7 +88,7 @@ TEST(JNIInvocation, NonDebuggable) {
         EXPECT_FALSE(strcmp(result, kTestNonNull2) == 0);
     }
 
-    result = JniInvocation::GetLibrary(kTestNonNull, buffer, is_debuggable, nullptr);
+    result = JniInvocationGetLibraryWith(kTestNonNull, buffer, IsDebuggableNever, nullptr);
     EXPECT_FALSE(result == NULL);
     if (result != NULL) {
         EXPECT_TRUE(strcmp(result, kExpected) == 0);
