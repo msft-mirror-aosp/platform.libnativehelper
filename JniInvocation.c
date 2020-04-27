@@ -104,7 +104,8 @@ jint JNI_GetCreatedJavaVMs(JavaVM** vms, jsize size, jsize* vm_count) {
 const char* JniInvocationGetLibraryWith(const char* library, char* buffer,
                                         int (*is_debuggable)(),
                                         int (*get_library_system_property)(char* buffer)) {
-  const char* default_library = kLibraryFallback;
+#ifdef __ANDROID__
+  const char* default_library;
 
   if (!is_debuggable()) {
     // Not a debuggable build.
@@ -112,6 +113,7 @@ const char* JniInvocationGetLibraryWith(const char* library, char* buffer,
     // will also ignore the default library, but initialize to fallback
     // for cleanliness.
     library = kLibraryFallback;
+    default_library = kLibraryFallback;
   } else {
     // Debuggable build.
     // Accept the library parameter. For the case it is NULL, load the default
@@ -119,10 +121,20 @@ const char* JniInvocationGetLibraryWith(const char* library, char* buffer,
     if (buffer != NULL) {
       if (get_library_system_property(buffer) > 0) {
         default_library = buffer;
+      } else {
+        default_library = kLibraryFallback;
       }
+    } else {
+      // No buffer given, just use default fallback.
+      default_library = kLibraryFallback;
     }
   }
-
+#else
+  UNUSED(buffer);
+  UNUSED(is_debuggable);
+  UNUSED(get_library_system_property);
+  const char* default_library = kLibraryFallback;
+#endif
   if (library == NULL) {
     library = default_library;
   }
