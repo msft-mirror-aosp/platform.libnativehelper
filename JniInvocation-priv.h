@@ -20,9 +20,9 @@
 
 __BEGIN_DECLS
 
-const char* JniInvocationGetLibraryWith(const char* library, char* buffer,
-                                        int (*is_debuggable)(),
-                                        int (*get_library_system_property)(char* buffer));
+const char* JniInvocationGetLibraryWith(const char* library,
+                                        bool is_debuggable,
+                                        const char* system_preferred_library);
 
 __END_DECLS
 

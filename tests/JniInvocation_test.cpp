@@ -20,81 +20,34 @@
 
 #include "string.h"
 
-#if defined(__ANDROID__) && defined(__BIONIC__)
-#define HAVE_TEST_STUFF 1
-#else
-#undef HAVE_TEST_STUFF
-#endif
-
-#ifdef HAVE_TEST_STUFF
-
-// PROPERTY_VALUE_MAX.
-#include "cutils/properties.h"
-
-#endif
-
-#ifdef HAVE_TEST_STUFF
-
+static const char* kDefaultJniInvocationLibrary = "libart.so";
 static const char* kTestNonNull = "libartd.so";
 static const char* kTestNonNull2 = "libartd2.so";
-static const char* kExpected = "libart.so";
-
-static int IsDebuggableAlways() {
-    return 1;
-}
-
-static int IsDebuggableNever() {
-    return 0;
-}
-
-static int GetPropertyForTest(char* buffer) {
-    strcpy(buffer, kTestNonNull2);
-    return strlen(buffer);
-}
-
-#endif  // HAVE_TEST_STUFF
 
 TEST(JNIInvocation, Debuggable) {
-#ifdef HAVE_TEST_STUFF
-    char buffer[PROPERTY_VALUE_MAX];
-    const char* result =
-        JniInvocationGetLibraryWith(NULL, buffer, IsDebuggableAlways, GetPropertyForTest);
-    EXPECT_FALSE(result == NULL);
-    if (result != NULL) {
-        EXPECT_TRUE(strcmp(result, kTestNonNull2) == 0);
-        EXPECT_FALSE(strcmp(result, kExpected) == 0);
-    }
+    const char* result = JniInvocationGetLibraryWith(nullptr, true, kTestNonNull2);
+    EXPECT_STREQ(result, kTestNonNull2);
 
-    result =
-        JniInvocationGetLibraryWith(kTestNonNull, buffer, IsDebuggableAlways, GetPropertyForTest);
-    EXPECT_FALSE(result == NULL);
-    if (result != NULL) {
-        EXPECT_TRUE(strcmp(result, kTestNonNull) == 0);
-        EXPECT_FALSE(strcmp(result, kTestNonNull2) == 0);
-    }
-#else
-    GTEST_LOG_(WARNING) << "Host testing unsupported. Please run target tests.";
-#endif
+    result = JniInvocationGetLibraryWith(kTestNonNull, true, kTestNonNull2);
+    EXPECT_STREQ(result, kTestNonNull);
+
+    result = JniInvocationGetLibraryWith(kTestNonNull, true, nullptr);
+    EXPECT_STREQ(result, kTestNonNull);
+
+    result = JniInvocationGetLibraryWith(nullptr, true, nullptr);
+    EXPECT_STREQ(result, kDefaultJniInvocationLibrary);
 }
 
 TEST(JNIInvocation, NonDebuggable) {
-#ifdef HAVE_TEST_STUFF
-    char buffer[PROPERTY_VALUE_MAX];
-    const char* result = JniInvocationGetLibraryWith(NULL, buffer, IsDebuggableNever, nullptr);
-    EXPECT_FALSE(result == NULL);
-    if (result != NULL) {
-        EXPECT_TRUE(strcmp(result, kExpected) == 0);
-        EXPECT_FALSE(strcmp(result, kTestNonNull) == 0);
-        EXPECT_FALSE(strcmp(result, kTestNonNull2) == 0);
-    }
+    const char* result = JniInvocationGetLibraryWith(nullptr, false, kTestNonNull2);
+    EXPECT_STREQ(result, kDefaultJniInvocationLibrary);
 
-    result = JniInvocationGetLibraryWith(kTestNonNull, buffer, IsDebuggableNever, nullptr);
-    EXPECT_FALSE(result == NULL);
-    if (result != NULL) {
-        EXPECT_TRUE(strcmp(result, kExpected) == 0);
-        EXPECT_FALSE(strcmp(result, kTestNonNull) == 0);
-    }
-#else
-    GTEST_LOG_(WARNING) << "Host testing unsupported. Please run target tests.";
-#endif
+    result = JniInvocationGetLibraryWith(kTestNonNull, false, kTestNonNull2);
+    EXPECT_STREQ(result, kDefaultJniInvocationLibrary);
+
+    result = JniInvocationGetLibraryWith(kTestNonNull, false, nullptr);
+    EXPECT_STREQ(result, kDefaultJniInvocationLibrary);
+
+    result = JniInvocationGetLibraryWith(nullptr, false, nullptr);
+    EXPECT_STREQ(result, kDefaultJniInvocationLibrary);
 }
