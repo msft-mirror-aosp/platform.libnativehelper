@@ -30,8 +30,8 @@
 
 #include "DlHelp.h"
 
-// Name of fallback library.
-static const char* kLibraryFallback = "libart.so";
+// Name the default library providing the JNI Invocation API.
+static const char* kDefaultJniInvocationLibrary = "libart.so";
 
 struct JniInvocationImpl {
   // Name of library providing JNI_ method implementations.
@@ -54,13 +54,14 @@ static struct JniInvocationImpl g_impl;
 
 #define UNUSED(x) (x) = (x)
 
-static int IsDebuggable() {
+static bool IsDebuggable() {
 #ifdef __ANDROID__
   char debuggable[PROP_VALUE_MAX] = {0};
   __system_property_get("ro.debuggable", debuggable);
   return strcmp(debuggable, "1") == 0;
 #else
-  return 0;
+  // Host is always treated as debuggable, which allows choice of library to be overridden.
+  return true;
 #endif
 }
 
@@ -68,6 +69,7 @@ static int GetLibrarySystemProperty(char* buffer) {
 #ifdef __ANDROID__
   return __system_property_get("persist.sys.dalvik.vm.lib.2", buffer);
 #else
+  // Host does not use properties.
   UNUSED(buffer);
   return 0;
 #endif
@@ -101,49 +103,31 @@ jint JNI_GetCreatedJavaVMs(JavaVM** vms, jsize size, jsize* vm_count) {
 // JniInvocation functions for setting up JNI functions.
 //
 
-const char* JniInvocationGetLibraryWith(const char* library, char* buffer,
-                                        int (*is_debuggable)(),
-                                        int (*get_library_system_property)(char* buffer)) {
-#ifdef __ANDROID__
-  const char* default_library;
+const char* JniInvocationGetLibraryWith(const char* library,
+                                        bool is_debuggable,
+                                        const char* system_preferred_library) {
+  if (is_debuggable) {
+    // Debuggable property is set. Allow library providing JNI Invocation API to be overridden.
 
-  if (!is_debuggable()) {
-    // Not a debuggable build.
-    // Do not allow arbitrary library. Ignore the library parameter. This
-    // will also ignore the default library, but initialize to fallback
-    // for cleanliness.
-    library = kLibraryFallback;
-    default_library = kLibraryFallback;
-  } else {
-    // Debuggable build.
-    // Accept the library parameter. For the case it is NULL, load the default
-    // library from the system property.
-    if (buffer != NULL) {
-      if (get_library_system_property(buffer) > 0) {
-        default_library = buffer;
-      } else {
-        default_library = kLibraryFallback;
-      }
-    } else {
-      // No buffer given, just use default fallback.
-      default_library = kLibraryFallback;
+    // Choose the library parameter (if provided).
+    if (library != NULL) {
+      return library;
+    }
+    // Choose the system_preferred_library (if provided).
+    if (system_preferred_library != NULL) {
+      return system_preferred_library;
     }
   }
-#else
-  UNUSED(buffer);
-  UNUSED(is_debuggable);
-  UNUSED(get_library_system_property);
-  const char* default_library = kLibraryFallback;
-#endif
-  if (library == NULL) {
-    library = default_library;
-  }
-
-  return library;
+  return kDefaultJniInvocationLibrary;
 }
 
 const char* JniInvocationGetLibrary(const char* library, char* buffer) {
-  return JniInvocationGetLibraryWith(library, buffer, IsDebuggable, GetLibrarySystemProperty);
+  bool debuggable = IsDebuggable();
+  const char* system_preferred_library = NULL;
+  if (buffer != NULL && (GetLibrarySystemProperty(buffer) > 0)) {
+    system_preferred_library = buffer;
+  }
+  return JniInvocationGetLibraryWith(library, debuggable, system_preferred_library);
 }
 
 struct JniInvocationImpl* JniInvocationCreate() {
@@ -163,7 +147,7 @@ bool JniInvocationInit(struct JniInvocationImpl* instance, const char* library_n
   library_name = JniInvocationGetLibrary(library_name, buffer);
   DlLibrary library = DlOpenLibrary(library_name);
   if (library == NULL) {
-    if (strcmp(library_name, kLibraryFallback) == 0) {
+    if (strcmp(library_name, kDefaultJniInvocationLibrary) == 0) {
       // Nothing else to try.
       ALOGE("Failed to dlopen %s: %s", library_name, DlGetError());
       return false;
@@ -174,8 +158,8 @@ bool JniInvocationInit(struct JniInvocationImpl* instance, const char* library_n
     // RuntimeInit.commonInit for where we fix up the property to
     // avoid future fallbacks. http://b/11463182
     ALOGW("Falling back from %s to %s after dlopen error: %s",
-          library_name, kLibraryFallback, DlGetError());
-    library_name = kLibraryFallback;
+          library_name, kDefaultJniInvocationLibrary, DlGetError());
+    library_name = kDefaultJniInvocationLibrary;
     library = DlOpenLibrary(library_name);
     if (library == NULL) {
       ALOGE("Failed to dlopen %s: %s", library, DlGetError());
