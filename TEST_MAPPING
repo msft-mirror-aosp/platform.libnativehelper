@@ -1,7 +1,7 @@
 {
   "presubmit": [
     {
-      "name": "JniInvocation_test"
+      "name": "libnativehelper_tests"
     }
   ]
 }
