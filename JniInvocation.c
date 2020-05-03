@@ -177,7 +177,7 @@ bool JniInvocationInit(struct JniInvocationImpl* instance, const char* library_n
     return false;
   }
 
-  DlSymbol JNI_GetCreatedJavaVMs_ = FindSymbol(library, "JNI_CreateJavaVM");
+  DlSymbol JNI_GetCreatedJavaVMs_ = FindSymbol(library, "JNI_GetCreatedJavaVMs");
   if (JNI_GetCreatedJavaVMs_ == NULL) {
     return false;
   }
