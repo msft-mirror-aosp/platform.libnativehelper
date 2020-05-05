@@ -62,6 +62,12 @@ cc_library_headers {
     sdk_version: "current",
     // As part of mainline modules(APEX), it should support at least 29(Q)
     min_sdk_version: "29",
+
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.art.debug",
+        "com.android.art.release",
+    ],
 }
 
 cc_library_headers {
@@ -77,9 +83,15 @@ cc_library_headers {
             enabled: true,
         },
     },
+
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.art.debug",
+        "com.android.art.release",
+    ],
 }
 
-cc_library {
+cc_library_shared {
     name: "libnativehelper",
     defaults: ["libnativehelper_defaults"],
     host_supported: true,
@@ -111,11 +123,6 @@ cc_library {
     apex_available: [
         "com.android.art.release",
         "com.android.art.debug",
-        // b/133140750 Clean this up. This is due to the dependency from libplatform_library_jni,
-        // librs_jni, libjni_legacymosaic, etc.
-        "//apex_available:platform",
-        // b/133140750 Clean this up, or allow this library to everywhere
-        "com.android.bluetooth.updatable",
     ],
 }
 
