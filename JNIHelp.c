@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include <nativehelper/libnativehelper_api.h>
+#include "include/nativehelper/JNIHelp.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -27,7 +27,6 @@
 #include "ALog-priv.h"
 
 #include "ExpandableString.h"
-#include "JniConstants.h"
 
 //
 // Helper methods
@@ -50,16 +49,16 @@ static const char* platformStrError(int errnum, char* buf, size_t buflen) {
 #endif
 }
 
-static int GetBufferPosition(JNIEnv* env, jobject nioBuffer) {
-    return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer_position(env));
-}
-
-static int GetBufferLimit(JNIEnv* env, jobject nioBuffer) {
-    return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer_limit(env));
-}
-
-static int GetBufferElementSizeShift(JNIEnv* env, jobject nioBuffer) {
-    return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer__elementSizeShift(env));
+static jmethodID FindMethod(JNIEnv* env,
+                            const char* className,
+                            const char* methodName,
+                            const char* descriptor) {
+    // This method is only valid for classes in the core library which are
+    // not unloaded during the lifetime of managed code execution.
+    jclass clazz = (*env)->FindClass(env, className);
+    jmethodID methodId = (*env)->GetMethodID(env, clazz, methodName, descriptor);
+    (*env)->DeleteLocalRef(env, clazz);
+    return methodId;
 }
 
 static bool AppendJString(JNIEnv* env, jstring text, struct ExpandableString* dst) {
@@ -79,10 +78,9 @@ static bool AppendJString(JNIEnv* env, jstring text, struct ExpandableString* ds
  */
 static bool GetExceptionSummary(JNIEnv* env, jthrowable thrown, struct ExpandableString* dst) {
     // Summary is <exception_class_name> ": " <exception_message>
-    jclass exceptionClass = (*env)->GetObjectClass(env, thrown);        // always succeeds
-
-    jstring className =
-        (jstring) (*env)->CallObjectMethod(env, exceptionClass, JniConstants_Class_getName(env));
+    jclass exceptionClass = (*env)->GetObjectClass(env, thrown);  // Always succeeds
+    jmethodID getName = FindMethod(env, "java/lang/Class", "getName", "()Ljava/lang/String;");
+    jstring className = (jstring) (*env)->CallObjectMethod(env, exceptionClass, getName);
     if (className == NULL) {
         ExpandableStringAssign(dst, "<error getting class name>");
         (*env)->ExceptionClear(env);
@@ -101,8 +99,9 @@ static bool GetExceptionSummary(JNIEnv* env, jthrowable thrown, struct Expandabl
     (*env)->DeleteLocalRef(env, className);
     className = NULL;
 
-    jstring message =
-        (jstring) (*env)->CallObjectMethod(env, thrown, JniConstants_Throwable_getMessage(env));
+    jmethodID getMessage =
+        FindMethod(env, "java/lang/Throwable", "getMessage", "()Ljava/lang/String;");
+    jstring message = (jstring) (*env)->CallObjectMethod(env, thrown, getMessage);
     if (message == NULL) {
         return true;
     }
@@ -134,11 +133,9 @@ static jobject NewStringWriter(JNIEnv* env) {
 }
 
 static jstring StringWriterToString(JNIEnv* env, jobject stringWriter) {
-    jclass clazz = (*env)->FindClass(env, "java/io/StringWriter");
-    jmethodID toString = (*env)->GetMethodID(env, clazz, "toString", "()Ljava/lang/String;");
-    jobject result = (*env)->CallObjectMethod(env, stringWriter, toString);
-    (*env)->DeleteLocalRef(env, clazz);
-    return (jstring) result;
+    jmethodID toString =
+        FindMethod(env, "java/io/StringWriter", "toString", "()Ljava/lang/String;");
+    return (jstring) (*env)->CallObjectMethod(env, stringWriter, toString);
 }
 
 static jobject NewPrintWriter(JNIEnv* env, jobject writer) {
@@ -167,7 +164,10 @@ static bool GetStackTrace(JNIEnv* env, jthrowable thrown, struct ExpandableStrin
         return false;
     }
 
-    (*env)->CallVoidMethod(env, thrown, JniConstants_Throwable_printStackTrace(env), pw);
+    jmethodID printStackTrace =
+        FindMethod(env, "java/lang/Throwable", "printStackTrace", "(Ljava/io/PrintWriter;)V");
+    (*env)->CallVoidMethod(env, thrown, printStackTrace, pw);
+
     jstring trace = StringWriterToString(env, sw);
 
     (*env)->DeleteLocalRef(env, pw);
@@ -234,7 +234,7 @@ static void DiscardPendingException(JNIEnv* env, const char* className) {
 }
 
 //
-// libnativehelper API
+// JNIHelp external API
 //
 
 int jniRegisterNativeMethods(JNIEnv* env, const char* className,
@@ -317,70 +317,9 @@ int jniThrowIOException(JNIEnv* env, int errnum) {
     return jniThrowException(env, "java/io/IOException", message);
 }
 
-jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    jobject fileDescriptor = (*env)->NewObject(env,
-                                               JniConstants_FileDescriptorClass(env),
-                                               JniConstants_FileDescriptor_init(env));
-    // NOTE: NewObject ensures that an OutOfMemoryError will be seen by the Java
-    // caller if the alloc fails, so we just return nullptr when that happens.
-    if (fileDescriptor != NULL)  {
-        jniSetFileDescriptorOfFD(env, fileDescriptor, fd);
-    }
-    return fileDescriptor;
-}
-
-int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    if (fileDescriptor != NULL) {
-        return (*env)->GetIntField(env, fileDescriptor,
-                                   JniConstants_FileDescriptor_descriptor(env));
-    } else {
-        return -1;
-    }
-}
-
-void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    if (fileDescriptor == NULL) {
-        jniThrowNullPointerException(env, "null FileDescriptor");
-    } else {
-        (*env)->SetIntField(env,
-                            fileDescriptor, JniConstants_FileDescriptor_descriptor(env), value);
-    }
-}
-
-jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
-    jclass nioAccessClass = JniConstants_NIOAccessClass(env);
-    jmethodID getBaseArrayMethod = JniConstants_NIOAccess_getBaseArray(env);
-    jobject object = (*env)->CallStaticObjectMethod(env,
-                                                    nioAccessClass, getBaseArrayMethod, nioBuffer);
-    return (jarray) object;
-}
-
-int jniGetNioBufferBaseArrayOffset(JNIEnv* env, jobject nioBuffer) {
-    jclass nioAccessClass = JniConstants_NIOAccessClass(env);
-    jmethodID getBaseArrayOffsetMethod = JniConstants_NIOAccess_getBaseArrayOffset(env);
-    return (*env)->CallStaticIntMethod(env, nioAccessClass, getBaseArrayOffsetMethod, nioBuffer);
-}
-
-jlong jniGetNioBufferPointer(JNIEnv* env, jobject nioBuffer) {
-    jlong baseAddress = (*env)->GetLongField(env, nioBuffer, JniConstants_NioBuffer_address(env));
-    if (baseAddress != 0) {
-        const int position = GetBufferPosition(env, nioBuffer);
-        const int shift = GetBufferElementSizeShift(env, nioBuffer);
-        baseAddress += position << shift;
-    }
-    return baseAddress;
-}
-
-jlong jniGetNioBufferFields(JNIEnv* env, jobject nioBuffer,
-                            jint* position, jint* limit, jint* elementSizeShift) {
-    *position = GetBufferPosition(env, nioBuffer);
-    *limit = GetBufferLimit(env, nioBuffer);
-    *elementSizeShift = GetBufferElementSizeShift(env, nioBuffer);
-    return (*env)->GetLongField(env, nioBuffer, JniConstants_NioBuffer_address(env));
-}
-
 jobject jniGetReferent(JNIEnv* env, jobject ref) {
-    return (*env)->CallObjectMethod(env, ref, JniConstants_Reference_get(env));
+    jmethodID get = FindMethod(env, "java/lang/ref/Reference", "get", "()Ljava/lang/Object;");
+    return (*env)->CallObjectMethod(env, ref, get);
 }
 
 jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
@@ -388,5 +327,8 @@ jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
 }
 
 jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count) {
-    return (*env)->NewObjectArray(env, count, JniConstants_StringClass(env), NULL);
+    jclass stringClass = (*env)->FindClass(env,  "java/lang/String");
+    jobjectArray result = (*env)->NewObjectArray(env, count, stringClass, NULL);
+    (*env)->DeleteLocalRef(env, stringClass);
+    return result;
 }
