@@ -119,7 +119,6 @@ cc_library_shared {
             enabled: true,
         },
     },
-    // Please avoid adding APEX dependencies on this for R (b/157711673).
     apex_available: [
         "com.android.art.release",
         "com.android.art.debug",
@@ -157,6 +156,17 @@ cc_library_shared {
     ],
     sdk_version: "19",
     stl: "none",
+    apex_available: [
+        "//apex_available:platform",
+        "com.android.tethering",
+    ],
+    visibility: [
+        "//cts:__subpackages__",
+        "//external/perfetto:__subpackages__",
+        "//frameworks/base/tests/net/integration:__pkg__",
+        "//frameworks/base/packages/Tethering:__subpackages__",
+        "//packages/modules/NetworkStack:__subpackages__",
+    ],
 }
 
 ndk_headers {
