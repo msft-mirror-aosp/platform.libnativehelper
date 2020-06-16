@@ -246,10 +246,25 @@ int jniRegisterNativeMethods(JNIEnv* env, const char* className,
                          "Native registration unable to find class '%s'; aborting...",
                          className);
     int result = (*env)->RegisterNatives(env, clazz, methods, numMethods);
-    ALOG_ALWAYS_FATAL_IF(result < 0, "RegisterNatives failed for '%s'; aborting...",
-                         className);
     (*env)->DeleteLocalRef(env, clazz);
-    return 0;
+    if (result == 0) {
+        return 0;
+    }
+
+    // Failure to register natives is fatal. Try to report the corresponding exception,
+    // otherwise abort with generic failure message.
+    jthrowable thrown = (*env)->ExceptionOccurred(env);
+    if (thrown != NULL) {
+        struct ExpandableString summary;
+        ExpandableStringInitialize(&summary);
+        if (GetExceptionSummary(env, thrown, &summary)) {
+            ALOGF("%s", summary.data);
+        }
+        ExpandableStringRelease(&summary);
+        (*env)->DeleteLocalRef(env, thrown);
+    }
+    ALOGF("RegisterNatives failed for '%s'; aborting...", className);
+    return result;
 }
 
 void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowable thrown) {

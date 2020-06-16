@@ -62,6 +62,10 @@
 #define ALOGE(...) ((void)ALOG(LOG_ERROR, LOG_TAG, __VA_ARGS__))
 #endif
 
+#ifndef ALOGF
+#define ALOGF(...) ((void)ALOG(LOG_FATAL, LOG_TAG, __VA_ARGS__))
+#endif
+
 /*
  * Log a fatal error if cond is true. The condition test is inverted from
  * assert(3) semantics. The test and message are not stripped from release
