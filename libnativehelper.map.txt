@@ -1,7 +1,7 @@
 # This library should only export C linkage definitions.
 #
 # VERSION string that follows is derived from <library_name>_<version>.
-LIBNATIVEHELPER_1 {
+LIBNATIVEHELPER_30 {
   global:
     JNI_GetDefaultJavaVMInitArgs;
     JNI_CreateJavaVM;

@@ -35,7 +35,7 @@ cc_library_headers {
         "//apex_available:platform",
         "//apex_available:anyapex",
     ],
-    // recovery_available currently required for libchome (https://r.android.com/799940).
+    // recovery_available currently required for libchrome (https://r.android.com/799940).
     recovery_available: true,
     visibility: ["//visibility:public"],
     stl: "none",
@@ -59,10 +59,9 @@ cc_library_headers {
             enabled: true,
         },
     },
-    sdk_version: "current",
     // As part of mainline modules(APEX), it should support at least 29(Q)
     min_sdk_version: "29",
-
+    sdk_version: "minimum",
     apex_available: [
         "//apex_available:platform",
         "//apex_available:anyapex",
@@ -73,16 +72,16 @@ cc_library_headers {
     name: "jni_platform_headers",
     host_supported: true,
     export_include_dirs: [
-        "platform_include",
+        "include_platform_header_only",
     ],
     header_libs: ["jni_headers"],
     export_header_lib_headers: ["jni_headers"],
+    sdk_version: "minimum",
     target: {
         windows: {
             enabled: true,
         },
     },
-
     apex_available: [
         "//apex_available:platform",
         "com.android.art.debug",
@@ -98,6 +97,7 @@ cc_library_shared {
         "DlHelp.c",
         "ExpandableString.c",
         "JNIHelp.c",
+        "JNIPlatformHelp.c",
         "JniConstants.c",
         "JniInvocation.c",
     ],
@@ -105,20 +105,23 @@ cc_library_shared {
     export_include_dirs: [
         "header_only_include",
         "include",
-        "platform_include",
+        "include_jni",
+        "include_platform",
+        "include_platform_header_only",
     ],
-    header_libs: ["jni_headers"],
-    export_header_lib_headers: ["jni_headers"],
     stl: "none",
+    // The ART module is anticipated in 31(S).
+    min_sdk_version: "31",
     stubs: {
         symbol_file: "libnativehelper.map.txt",
-        versions: ["1"],
+        versions: ["30"],
     },
     target: {
         windows: {
             enabled: true,
         },
     },
+    // Only distributed in the ART Module.
     apex_available: [
         "com.android.art.release",
         "com.android.art.debug",
@@ -143,13 +146,14 @@ cc_library_shared {
     ],
     local_include_dirs: [
         "header_only_include",
-        "platform_include",
+        "include_platform_header_only",
     ],
     srcs: [
-        "DlHelp.c",
         "ExpandableString.c",
         "JNIHelp.c",
-        "JniConstants.c",
+        // This is needed for NetworkStack and Tethering until a better
+        // solution is found (b/158749603).
+        "JNIHelpCompat.c",
     ],
     shared_libs: [
         "liblog",
