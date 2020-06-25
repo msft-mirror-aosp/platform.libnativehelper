@@ -16,12 +16,12 @@
 
 #pragma once
 
-#include "libnativehelper_api.h"
-
 #ifdef __cplusplus
 
 #include <string>
 #include <vector>
+
+#include "JNIHelp.h"
 #include "ScopedLocalRef.h"
 
 template <typename StringVisitor>

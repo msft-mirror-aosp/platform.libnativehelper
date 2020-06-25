@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-#include "nativehelper/libnativehelper_api.h"
-
-#include "jni.h"
+#include "include_platform/nativehelper/JniInvocation.h"
 
 #define LOG_TAG "JniInvocation"
-#include <log/log.h>
+#include "ALog-priv.h"
 
 #if defined(__ANDROID__)
 #include <sys/system_properties.h>
 #endif
 
+#include <jni.h>
 #include <stdbool.h>
 #include <string.h>
 

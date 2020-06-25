@@ -21,8 +21,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <nativehelper/libnativehelper_api.h>
-
 #define LOG_TAG "JniConstants"
 #include "ALog-priv.h"
 
@@ -30,26 +28,18 @@
 //   <class, signature, androidOnly>
 
 #define JCLASS_CONSTANTS_LIST(V)                                            \
-  V(Class, "java/lang/Class", false)                                        \
   V(FileDescriptor, "java/io/FileDescriptor", false)                        \
   V(NIOAccess, "java/nio/NIOAccess", true)                                  \
-  V(NioBuffer, "java/nio/Buffer", false)                                    \
-  V(Reference, "java/lang/ref/Reference", false)                            \
-  V(String, "java/lang/String", false)                                      \
-  V(Throwable, "java/lang/Throwable", false)
+  V(NioBuffer, "java/nio/Buffer", false)
 
 // jmethodID's of public methods constants list:
 //   <Class, method, method-string, signature, is_static>
 #define JMETHODID_CONSTANTS_LIST(V)                                                         \
-  V(Class, getName, "getName", "()Ljava/lang/String;", false)                               \
   V(FileDescriptor, init, "<init>", "()V", false)                                           \
   V(NIOAccess, getBaseArray, "getBaseArray", "(Ljava/nio/Buffer;)Ljava/lang/Object;", true) \
   V(NIOAccess, getBaseArrayOffset, "getBaseArrayOffset", "(Ljava/nio/Buffer;)I", true)      \
   V(NioBuffer, array, "array", "()Ljava/lang/Object;", false)                               \
-  V(NioBuffer, arrayOffset, "arrayOffset", "()I", false)                                    \
-  V(Reference, get, "get", "()Ljava/lang/Object;", false)                                   \
-  V(Throwable, getMessage, "getMessage", "()Ljava/lang/String;", false)                     \
-  V(Throwable, printStackTrace, "printStackTrace", "(Ljava/io/PrintWriter;)V", false)
+  V(NioBuffer, arrayOffset, "arrayOffset", "()I", false)
 
 // jfieldID constants list:
 //   <Class, field, signature, is_static>

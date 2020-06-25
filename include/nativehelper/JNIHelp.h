@@ -22,14 +22,103 @@
  */
 #pragma once
 
+#include <sys/cdefs.h>
+
 #include <errno.h>
 #include <unistd.h>
 
-#include "libnativehelper_api.h"
+#include <jni.h>
 
 #ifndef NELEM
 #define NELEM(x) ((int) (sizeof(x) / sizeof((x)[0])))
 #endif
+
+__BEGIN_DECLS
+
+
+/*
+ * Register one or more native methods with a particular class.  "className" looks like
+ * "java/lang/String". Aborts on failure, returns 0 on success.
+ */
+int jniRegisterNativeMethods(C_JNIEnv* env,
+                             const char* className,
+                             const JNINativeMethod* gMethods,
+                             int numMethods);
+
+/*
+ * Throw an exception with the specified class and an optional message.
+ *
+ * The "className" argument will be passed directly to FindClass, which
+ * takes strings with slashes (e.g. "java/lang/Object").
+ *
+ * If an exception is currently pending, we log a warning message and
+ * clear it.
+ *
+ * Returns 0 on success, nonzero if something failed (e.g. the exception
+ * class couldn't be found, so *an* exception will still be pending).
+ *
+ * Currently aborts the VM if it can't throw the exception.
+ */
+int jniThrowException(C_JNIEnv* env, const char* className, const char* msg);
+
+/*
+ * Throw an exception with the specified class and formatted error message.
+ *
+ * The "className" argument will be passed directly to FindClass, which
+ * takes strings with slashes (e.g. "java/lang/Object").
+ *
+ * If an exception is currently pending, we log a warning message and
+ * clear it.
+ *
+ * Returns 0 on success, nonzero if something failed (e.g. the exception
+ * class couldn't be found, so *an* exception will still be pending).
+ *
+ * Currently aborts the VM if it can't throw the exception.
+ */
+int jniThrowExceptionFmt(C_JNIEnv* env, const char* className, const char* fmt, va_list args);
+
+/*
+ * Throw a java.lang.NullPointerException, with an optional message.
+ */
+int jniThrowNullPointerException(C_JNIEnv* env, const char* msg);
+
+/*
+ * Throw a java.lang.RuntimeException, with an optional message.
+ */
+int jniThrowRuntimeException(C_JNIEnv* env, const char* msg);
+
+/*
+ * Throw a java.io.IOException, generating the message from errno.
+ */
+int jniThrowIOException(C_JNIEnv* env, int errnum);
+
+/*
+ * Returns the reference from a java.lang.ref.Reference.
+ */
+jobject jniGetReferent(C_JNIEnv* env, jobject ref);
+
+/*
+ * Returns a Java String object created from UTF-16 data either from jchar or,
+ * if called from C++11, char16_t (a bitwise identical distinct type).
+ */
+jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len);
+
+/*
+ * Allocates a new array for java/lang/String instances with space for |count| elements. Elements
+ * are initially null.
+ *
+ * Returns a new array on success or nullptr in case of failure. This method raises an
+ * OutOfMemoryError exception if allocation fails.
+ */
+jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count);
+
+/*
+ * Log a message and an exception.
+ * If exception is NULL, logs the current exception in the JNI environment.
+ */
+void jniLogException(C_JNIEnv* env, int priority, const char* tag, jthrowable exception);
+
+__END_DECLS
 
 /*
  * For C++ code, we provide inlines that map to the C functions.  g++ always
@@ -66,36 +155,6 @@ inline int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
 
 inline int jniThrowIOException(JNIEnv* env, int errnum) {
     return jniThrowIOException(&env->functions, errnum);
-}
-
-inline jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    return jniCreateFileDescriptor(&env->functions, fd);
-}
-
-inline int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    return jniGetFDFromFileDescriptor(&env->functions, fileDescriptor);
-}
-
-inline void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    jniSetFileDescriptorOfFD(&env->functions, fileDescriptor, value);
-}
-
-inline jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
-    return jniGetNioBufferBaseArray(&env->functions, nioBuffer);
-}
-
-inline jint jniGetNioBufferBaseArrayOffset(JNIEnv* env, jobject nioBuffer) {
-    return jniGetNioBufferBaseArrayOffset(&env->functions, nioBuffer);
-}
-
-inline jlong jniGetNioBufferFields(JNIEnv* env, jobject nioBuffer,
-                                   jint* position, jint* limit, jint* elementSizeShift) {
-    return jniGetNioBufferFields(&env->functions, nioBuffer,
-                                 position, limit, elementSizeShift);
-}
-
-inline jlong jniGetNioBufferPointer(JNIEnv* env, jobject nioBuffer) {
-    return jniGetNioBufferPointer(&env->functions, nioBuffer);
 }
 
 inline jobject jniGetReferent(JNIEnv* env, jobject ref) {
