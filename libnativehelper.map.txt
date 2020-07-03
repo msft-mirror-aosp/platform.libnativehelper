@@ -1,7 +1,7 @@
 # This library should only export C linkage definitions.
 #
 # VERSION string that follows is derived from <library_name>_<version>.
-LIBNATIVEHELPER_30 {
+LIBNATIVEHELPER_31 {
   global:
     JNI_GetDefaultJavaVMInitArgs;
     JNI_CreateJavaVM;
@@ -31,6 +31,16 @@ LIBNATIVEHELPER_30 {
     JniInvocationInit;
     JniInvocationGetLibrary;
 
+  local:
+    *;
+};
+
+# NDK API for libnativehelper.
+LIBNATIVEHELPER_S { # introduced=31
+  global:
+    AFileDescriptor_create;
+    AFileDescriptor_getFD;
+    AFileDescriptor_setFD;
   local:
     *;
 };

@@ -110,13 +110,15 @@ cc_library_shared {
         "include_platform_header_only",
     ],
     stl: "none",
-    // The ART module is anticipated in 31(S).
-    min_sdk_version: "31",
     stubs: {
         symbol_file: "libnativehelper.map.txt",
-        versions: ["30"],
+        versions: ["31"],
     },
     target: {
+        android: {
+            // FileDescriptor NDK API is Android-only.
+            srcs: ["file_descriptor_jni.c"],
+        },
         windows: {
             enabled: true,
         },
@@ -180,6 +182,20 @@ ndk_headers {
     to: "",
     srcs: ["include_jni/jni.h"],
     license: "NOTICE",
+}
+
+ndk_headers {
+    name: "libnativehelper_ndk_headers",
+    from: "include",
+    to: "",
+    srcs: ["include/android/*.h"],
+    license: "NOTICE",
+}
+
+ndk_library {
+    name: "libnativehelper",
+    symbol_file: "libnativehelper.map.txt",
+    first_version: "31",
 }
 
 //
