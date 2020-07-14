@@ -161,7 +161,7 @@ bool JniInvocationInit(struct JniInvocationImpl* instance, const char* library_n
     library_name = kDefaultJniInvocationLibrary;
     library = DlOpenLibrary(library_name);
     if (library == NULL) {
-      ALOGE("Failed to dlopen %s: %s", library, DlGetError());
+      ALOGE("Failed to dlopen %s: %s", library_name, DlGetError());
       return false;
     }
   }
