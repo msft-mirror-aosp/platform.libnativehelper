@@ -81,7 +81,7 @@ int AFileDescriptor_getFD(JNIEnv* env, jobject fileDescriptor) __INTRODUCED_IN(3
  */
 void AFileDescriptor_setFD(JNIEnv* env, jobject fileDescriptor, int fd) __INTRODUCED_IN(31);
 
-#endif  // __ANDROID_API__ >= 31
+#endif  // __ANDROID_API__ >= __ANDROID_API_S__
 
 __END_DECLS
 
