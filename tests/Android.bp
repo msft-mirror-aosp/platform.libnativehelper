@@ -5,7 +5,6 @@ cc_test {
     test_suites: ["device-tests"],
     host_supported: true,
     srcs: [
-        "scoped_bytes_test.cpp",
         "scoped_local_frame_test.cpp",
         "scoped_local_ref_test.cpp",
         "scoped_primitive_array_test.cpp",
