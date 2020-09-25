@@ -112,7 +112,7 @@ cc_library_shared {
     stl: "none",
     stubs: {
         symbol_file: "libnativehelper.map.txt",
-        versions: ["31"],
+        versions: ["S"],
     },
     target: {
         android: {
@@ -195,7 +195,7 @@ ndk_headers {
 ndk_library {
     name: "libnativehelper",
     symbol_file: "libnativehelper.map.txt",
-    first_version: "31",
+    first_version: "S",
 }
 
 //
