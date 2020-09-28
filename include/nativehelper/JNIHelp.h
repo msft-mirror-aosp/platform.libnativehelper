@@ -93,11 +93,6 @@ int jniThrowRuntimeException(C_JNIEnv* env, const char* msg);
 int jniThrowIOException(C_JNIEnv* env, int errnum);
 
 /*
- * Returns the reference from a java.lang.ref.Reference.
- */
-jobject jniGetReferent(C_JNIEnv* env, jobject ref);
-
-/*
  * Returns a Java String object created from UTF-16 data either from jchar or,
  * if called from C++11, char16_t (a bitwise identical distinct type).
  */
@@ -146,10 +141,6 @@ inline int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
 
 inline int jniThrowIOException(JNIEnv* env, int errnum) {
     return jniThrowIOException(&env->functions, errnum);
-}
-
-inline jobject jniGetReferent(JNIEnv* env, jobject ref) {
-    return jniGetReferent(&env->functions, ref);
 }
 
 inline jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
