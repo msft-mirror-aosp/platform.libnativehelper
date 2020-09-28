@@ -55,7 +55,6 @@ public class JniHelpTest extends AndroidTestCase {
     private static native long getDirectBufferAddress(Buffer b);
     private static native void assertBufferPointer(Buffer b, long address);
 
-    private static native Object getReferent(Reference r);
     private static native String createString(String input);
 
     static {
@@ -280,14 +279,6 @@ public class JniHelpTest extends AndroidTestCase {
         final byte [] backing = new byte[16];
         final ByteBuffer bb = ByteBuffer.wrap(backing, 4, 12);
         checkNioXHeapBuffers(bb, 0);
-    }
-
-    public void testGetReferent() {
-        Object o = new Object();
-        SoftReference r = new SoftReference<>(o);
-        assertSame(getReferent(r), o);
-        r.clear();
-        assertSame(getReferent(r), null);
     }
 
     public void testCreateString() {
