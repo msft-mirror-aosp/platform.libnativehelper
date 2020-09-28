@@ -186,10 +186,6 @@ static jstring createString(JNIEnv* env, jclass /*clazz*/, jstring value) {
     return jniCreateString(env, ssc.get(), ssc.size());
 }
 
-static jobjectArray createStringArray(JNIEnv* env, jclass /*clazz*/, jint length) {
-    return jniCreateStringArray(&env->functions, length);
-}
-
 }  // namespace
 
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -259,9 +255,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         MAKE_JNI_NATIVE_METHOD("createString",
                                "(Ljava/lang/String;)Ljava/lang/String;",
                                createString),
-        MAKE_JNI_NATIVE_METHOD("createStringArray",
-                               "(I)[Ljava/lang/String;",
-                               createStringArray)
     };
     int rc = jniRegisterNativeMethods(env,
                                       "android/libnativehelper/mts/JniHelpTest",

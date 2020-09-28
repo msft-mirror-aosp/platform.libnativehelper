@@ -325,10 +325,3 @@ jobject jniGetReferent(JNIEnv* env, jobject ref) {
 jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
     return (*env)->NewString(env, unicodeChars, len);
 }
-
-jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count) {
-    jclass stringClass = (*env)->FindClass(env,  "java/lang/String");
-    jobjectArray result = (*env)->NewObjectArray(env, count, stringClass, NULL);
-    (*env)->DeleteLocalRef(env, stringClass);
-    return result;
-}

@@ -104,15 +104,6 @@ jobject jniGetReferent(C_JNIEnv* env, jobject ref);
 jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len);
 
 /*
- * Allocates a new array for java/lang/String instances with space for |count| elements. Elements
- * are initially null.
- *
- * Returns a new array on success or nullptr in case of failure. This method raises an
- * OutOfMemoryError exception if allocation fails.
- */
-jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count);
-
-/*
  * Log a message and an exception.
  * If exception is NULL, logs the current exception in the JNI environment.
  */
