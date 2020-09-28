@@ -57,7 +57,6 @@ public class JniHelpTest extends AndroidTestCase {
 
     private static native Object getReferent(Reference r);
     private static native String createString(String input);
-    private static native String[] createStringArray(int length);
 
     static {
         System.loadLibrary("nativehelper_mts_jni");
@@ -296,15 +295,5 @@ public class JniHelpTest extends AndroidTestCase {
         String output = createString(input);
         assertEquals(input, output);
         assertNotSame(input, output);
-    }
-
-    public void testCreateStringArray() {
-        for (int i = 0; i < 10; ++i) {
-            String[] array = createStringArray(i);
-            assertNotNull(array);
-            for (int j = 0; j < i; ++j) {
-                assertNull(array[j]);
-            }
-        }
     }
 }

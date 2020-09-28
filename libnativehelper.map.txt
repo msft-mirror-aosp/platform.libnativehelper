@@ -26,7 +26,6 @@ LIBNATIVEHELPER_S { # introduced=S
     jniGetNioBufferFields; # apex
     jniGetReferent; # apex
     jniCreateString; # apex
-    jniCreateStringArray; # apex
     jniLogException; # apex
     jniUninitializeConstants; # apex
 
