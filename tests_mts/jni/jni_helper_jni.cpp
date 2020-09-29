@@ -177,17 +177,9 @@ static void assertBufferPointer(JNIEnv* env, jclass /*clazz*/, jobject jnb, jlon
     }
 }
 
-static jobject getReferent(JNIEnv* env, jclass /*clazz*/, jobject reference) {
-    return jniGetReferent(env, reference);
-}
-
 static jstring createString(JNIEnv* env, jclass /*clazz*/, jstring value) {
     ScopedStringChars ssc(env, value);
     return jniCreateString(env, ssc.get(), ssc.size());
-}
-
-static jobjectArray createStringArray(JNIEnv* env, jclass /*clazz*/, jint length) {
-    return jniCreateStringArray(&env->functions, length);
 }
 
 }  // namespace
@@ -253,15 +245,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         MAKE_JNI_NATIVE_METHOD("assertBufferPointer",
                                "(Ljava/nio/Buffer;J)V",
                                assertBufferPointer),
-        MAKE_JNI_NATIVE_METHOD("getReferent",
-                               "(Ljava/lang/ref/Reference;)Ljava/lang/Object;",
-                               getReferent),
         MAKE_JNI_NATIVE_METHOD("createString",
                                "(Ljava/lang/String;)Ljava/lang/String;",
                                createString),
-        MAKE_JNI_NATIVE_METHOD("createStringArray",
-                               "(I)[Ljava/lang/String;",
-                               createStringArray)
     };
     int rc = jniRegisterNativeMethods(env,
                                       "android/libnativehelper/mts/JniHelpTest",

@@ -93,24 +93,10 @@ int jniThrowRuntimeException(C_JNIEnv* env, const char* msg);
 int jniThrowIOException(C_JNIEnv* env, int errnum);
 
 /*
- * Returns the reference from a java.lang.ref.Reference.
- */
-jobject jniGetReferent(C_JNIEnv* env, jobject ref);
-
-/*
  * Returns a Java String object created from UTF-16 data either from jchar or,
  * if called from C++11, char16_t (a bitwise identical distinct type).
  */
 jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len);
-
-/*
- * Allocates a new array for java/lang/String instances with space for |count| elements. Elements
- * are initially null.
- *
- * Returns a new array on success or nullptr in case of failure. This method raises an
- * OutOfMemoryError exception if allocation fails.
- */
-jobjectArray jniCreateStringArray(C_JNIEnv* env, size_t count);
 
 /*
  * Log a message and an exception.
@@ -155,10 +141,6 @@ inline int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
 
 inline int jniThrowIOException(JNIEnv* env, int errnum) {
     return jniThrowIOException(&env->functions, errnum);
-}
-
-inline jobject jniGetReferent(JNIEnv* env, jobject ref) {
-    return jniGetReferent(&env->functions, ref);
 }
 
 inline jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {

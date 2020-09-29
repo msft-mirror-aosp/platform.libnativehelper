@@ -26,8 +26,9 @@
 
 template <typename StringVisitor>
 jobjectArray toStringArray(JNIEnv* env, size_t count, StringVisitor&& visitor) {
-    C_JNIEnv* c_env = static_cast<C_JNIEnv*>(&env->functions);
-    ScopedLocalRef<jobjectArray> result(env, jniCreateStringArray(c_env, count));
+    jclass stringClass = env->FindClass("java/lang/String");
+    ScopedLocalRef<jobjectArray> result(env, env->NewObjectArray(count, stringClass, NULL));
+    env->DeleteLocalRef(stringClass);
     if (result == nullptr) {
         return nullptr;
     }

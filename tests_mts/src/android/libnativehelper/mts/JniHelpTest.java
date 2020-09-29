@@ -55,9 +55,7 @@ public class JniHelpTest extends AndroidTestCase {
     private static native long getDirectBufferAddress(Buffer b);
     private static native void assertBufferPointer(Buffer b, long address);
 
-    private static native Object getReferent(Reference r);
     private static native String createString(String input);
-    private static native String[] createStringArray(int length);
 
     static {
         System.loadLibrary("nativehelper_mts_jni");
@@ -283,28 +281,10 @@ public class JniHelpTest extends AndroidTestCase {
         checkNioXHeapBuffers(bb, 0);
     }
 
-    public void testGetReferent() {
-        Object o = new Object();
-        SoftReference r = new SoftReference<>(o);
-        assertSame(getReferent(r), o);
-        r.clear();
-        assertSame(getReferent(r), null);
-    }
-
     public void testCreateString() {
         String input = "The treacherous mountain path lay ahead.";
         String output = createString(input);
         assertEquals(input, output);
         assertNotSame(input, output);
-    }
-
-    public void testCreateStringArray() {
-        for (int i = 0; i < 10; ++i) {
-            String[] array = createStringArray(i);
-            assertNotNull(array);
-            for (int j = 0; j < i; ++j) {
-                assertNull(array[j]);
-            }
-        }
     }
 }
