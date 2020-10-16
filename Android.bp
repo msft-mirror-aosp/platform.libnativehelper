@@ -167,6 +167,7 @@ cc_library_shared {
         "com.android.tethering",
     ],
     visibility: [
+        "//art:__subpackages__",
         "//cts:__subpackages__",
         "//external/perfetto:__subpackages__",
         "//frameworks/base/tests/net/integration:__pkg__",
