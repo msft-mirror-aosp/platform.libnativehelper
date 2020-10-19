@@ -178,8 +178,9 @@ cc_library_shared {
 }
 
 // The NDK module definitions reside in
-// system/core/module_ndk_libs/libnativehelper in platform, with copies of these
-// headers and map.txt. Any changes here should be synced there and vice versa.
+// system/extras/module_ndk_libs/libnativehelper in platform, with copies of
+// these headers and map.txt. Any changes here should be synced there and vice
+// versa.
 //
 // TODO(b/170644498): Improve tooling to remove this duplication.
 //
