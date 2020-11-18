@@ -54,11 +54,6 @@ cc_library_headers {
     ],
     header_libs: ["jni_headers"],
     export_header_lib_headers: ["jni_headers"],
-    target: {
-        windows: {
-            enabled: true,
-        },
-    },
     // As part of mainline modules(APEX), it should support at least 29(Q)
     min_sdk_version: "29",
     sdk_version: "minimum",
@@ -77,11 +72,6 @@ cc_library_headers {
     header_libs: ["jni_headers"],
     export_header_lib_headers: ["jni_headers"],
     sdk_version: "minimum",
-    target: {
-        windows: {
-            enabled: true,
-        },
-    },
     apex_available: [
         "//apex_available:platform",
         "com.android.art",
@@ -118,9 +108,6 @@ cc_library_shared {
         android: {
             // FileDescriptor NDK API is Android-only.
             srcs: ["file_descriptor_jni.c"],
-        },
-        windows: {
-            enabled: true,
         },
     },
     // Only distributed in the ART Module.
