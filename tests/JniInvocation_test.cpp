@@ -17,8 +17,8 @@
 #include "../JniInvocation-priv.h"
 
 #include <gtest/gtest.h>
+#include <jni.h>
 
-#include "string.h"
 
 static const char* kDefaultJniInvocationLibrary = "libart.so";
 static const char* kTestNonNull = "libartd.so";
@@ -50,4 +50,22 @@ TEST(JNIInvocation, NonDebuggable) {
 
     result = JniInvocationGetLibraryWith(nullptr, false, nullptr);
     EXPECT_STREQ(result, kDefaultJniInvocationLibrary);
+}
+
+TEST(JNIInvocation, GetDefaultJavaVMInitArgsBeforeInit) {
+    EXPECT_DEATH(JNI_GetDefaultJavaVMInitArgs(nullptr), "Runtime library not loaded.");
+}
+
+TEST(JNIInvocation, CreateJavaVMBeforeInit) {
+    JavaVM *vm;
+    JNIEnv *env;
+    EXPECT_DEATH(JNI_CreateJavaVM(&vm, &env, nullptr), "Runtime library not loaded.");
+}
+
+TEST(JNIInvocation, GetCreatedJavaVMsBeforeInit) {
+    jsize vm_count;
+    JavaVM *vm;
+    int status = JNI_GetCreatedJavaVMs(&vm, 1, &vm_count);
+    EXPECT_EQ(status, JNI_OK);
+    EXPECT_EQ(vm_count, 0);
 }
