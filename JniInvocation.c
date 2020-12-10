@@ -87,14 +87,20 @@ static DlSymbol FindSymbol(DlLibrary library, const char* symbol) {
 //
 
 jint JNI_GetDefaultJavaVMInitArgs(void* vmargs) {
+  ALOG_ALWAYS_FATAL_IF(NULL == g_impl.JNI_GetDefaultJavaVMInitArgs, "Runtime library not loaded.");
   return g_impl.JNI_GetDefaultJavaVMInitArgs(vmargs);
 }
 
 jint JNI_CreateJavaVM(JavaVM** p_vm, JNIEnv** p_env, void* vm_args) {
+  ALOG_ALWAYS_FATAL_IF(NULL == g_impl.JNI_CreateJavaVM, "Runtime library not loaded.");
   return g_impl.JNI_CreateJavaVM(p_vm, p_env, vm_args);
 }
 
 jint JNI_GetCreatedJavaVMs(JavaVM** vms, jsize size, jsize* vm_count) {
+  if (NULL == g_impl.JNI_GetCreatedJavaVMs) {
+    *vm_count = 0;
+    return JNI_OK;
+  }
   return g_impl.JNI_GetCreatedJavaVMs(vms, size, vm_count);
 }
 
