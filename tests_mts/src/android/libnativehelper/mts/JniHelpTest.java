@@ -43,7 +43,6 @@ public class JniHelpTest extends AndroidTestCase {
 
     private static native FileDescriptor fileDescriptorCreate(int unixFd);
     private static native int fileDescriptorGetFD(FileDescriptor jiofd);
-    private static native int fileDescriptorGetFDCompatQR(FileDescriptor jiofd);
     private static native void fileDescriptorSetFD(FileDescriptor jiofd, int unixFd);
 
     private static native ByteBuffer allocateDirectNonHeapBuffer(int length);
@@ -164,13 +163,6 @@ public class JniHelpTest extends AndroidTestCase {
         FileDescriptor jiofd = fileDescriptorCreate(0);
         fileDescriptorSetFD(jiofd, UNIX_FD);
         assertEquals(UNIX_FD, fileDescriptorGetFD(jiofd));
-    }
-
-    public void testFileDescriptorSetCompatQRNonNull() {
-        final int UNIX_FD = 127;
-        FileDescriptor jiofd = fileDescriptorCreate(0);
-        fileDescriptorSetFD(jiofd, UNIX_FD);
-        assertEquals(UNIX_FD, fileDescriptorGetFDCompatQR(jiofd));
     }
 
     private static void checkNioBufferApi(final Buffer b,
