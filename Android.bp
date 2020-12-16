@@ -148,6 +148,7 @@ cc_library_shared {
     stl: "none",
     apex_available: [
         "//apex_available:platform",
+        "com.android.extservices",
         "com.android.tethering",
     ],
     visibility: [
@@ -158,6 +159,7 @@ cc_library_shared {
         "//frameworks/base/packages/Tethering:__subpackages__",
         "//packages/modules/Connectivity/tests:__subpackages__",
         "//packages/modules/Connectivity/Tethering:__subpackages__",
+        "//packages/modules/ExtServices:__subpackages__",
         "//packages/modules/NetworkStack:__subpackages__",
         ":__subpackages__",
     ],
