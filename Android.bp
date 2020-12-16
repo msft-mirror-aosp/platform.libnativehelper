@@ -140,9 +140,6 @@ cc_library_shared {
     srcs: [
         "ExpandableString.c",
         "JNIHelp.c",
-        // This is needed for NetworkStack and Tethering until a better
-        // solution is found (b/158749603).
-        "JNIHelpCompat.c",
     ],
     shared_libs: [
         "liblog",

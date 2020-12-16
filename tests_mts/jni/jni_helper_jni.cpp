@@ -28,8 +28,6 @@
 
 #include "libnativehelper_test.h"
 
-extern "C" int jniGetFDFromFileDescriptor_QR(JNIEnv* env, jobject fileDescriptor);
-
 namespace {
 
 void AssertionError(JNIEnv* env, const char* format, ...) {
@@ -92,13 +90,6 @@ static jobject fileDescriptorCreate(JNIEnv* env, jclass /*clazz*/, jint unix_fd)
 
 static jint fileDescriptorGetFD(JNIEnv* env, jclass /*clazz*/, jobject jiofd) {
     return jniGetFDFromFileDescriptor(env, jiofd);
-}
-
-static jint fileDescriptorGetFDCompatQR(JNIEnv* env, jclass /*clazz*/, jobject jiofd) {
-    // Compatibility version of jniGetFDFromFileDescriptor for NetworkStack and Tethering modules
-    // that need to run on Android versions back to Android Q and Android R. The symbol is exported
-    // by libnativehelper_compat_libc++.so.
-    return jniGetFDFromFileDescriptor_QR(env, jiofd);
 }
 
 static void fileDescriptorSetFD(JNIEnv* env, jclass /*clazz*/, jobject jiofd, jint unix_fd) {
@@ -215,9 +206,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         MAKE_JNI_NATIVE_METHOD("fileDescriptorGetFD",
                                "(Ljava/io/FileDescriptor;)I",
                                fileDescriptorGetFD),
-        MAKE_JNI_NATIVE_METHOD("fileDescriptorGetFDCompatQR",
-                               "(Ljava/io/FileDescriptor;)I",
-                               fileDescriptorGetFDCompatQR),
         MAKE_JNI_NATIVE_METHOD("fileDescriptorSetFD",
                                "(Ljava/io/FileDescriptor;I)V",
                                fileDescriptorSetFD),
