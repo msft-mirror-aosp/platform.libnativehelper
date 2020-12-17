@@ -93,3 +93,37 @@ TEST(JNIInvocation, NonDebuggable) {
     GTEST_LOG_(WARNING) << "Host testing unsupported. Please run target tests.";
 #endif
 }
+
+TEST(JNIInvocation, GetDefaultJavaVMInitArgsBeforeInit) {
+#ifdef HAVE_TEST_STUFF
+    EXPECT_DEATH(
+        JNI_GetDefaultJavaVMInitArgs(nullptr),
+        "Failed to create JniInvocation instance before using JNI invocation API.");
+#else
+    GTEST_LOG_(WARNING) << "Host testing unsupported. Please run target tests.";
+#endif
+}
+
+TEST(JNIInvocation, CreateJavaVMBeforeInit) {
+#ifdef HAVE_TEST_STUFF
+    JavaVM *vm;
+    JNIEnv *env;
+    EXPECT_DEATH(
+        JNI_CreateJavaVM(&vm, &env, nullptr),
+        "Failed to create JniInvocation instance before using JNI invocation API.");
+#else
+    GTEST_LOG_(WARNING) << "Host testing unsupported. Please run target tests.";
+#endif
+}
+
+TEST(JNIInvocation, GetCreatedJavaVMsBeforeInit) {
+#ifdef HAVE_TEST_STUFF
+    jsize vm_count;
+    JavaVM *vm;
+    int status = JNI_GetCreatedJavaVMs(&vm, 1, &vm_count);
+    EXPECT_EQ(status, JNI_OK);
+    EXPECT_EQ(vm_count, 0);
+#else
+    GTEST_LOG_(WARNING) << "Host testing unsupported. Please run target tests.";
+#endif
+}

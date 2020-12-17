@@ -48,9 +48,6 @@ cc_test {
         // Enable warning of converting ints to void*.
         "-Wint-to-void-pointer-cast",
 
-        // Enable warning of wrong unused annotations.
-        "-Wused-but-marked-unused",
-
         // Enable warning for deprecated language features.
         "-Wdeprecated",
 

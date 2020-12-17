@@ -117,6 +117,7 @@ struct JniInvocationImpl final {
                                 int (*get_library_system_property)(char* buffer) = GetLibrarySystemProperty);
 
   static JniInvocationImpl& GetJniInvocation();
+  static bool IsInitialized();
 
   jint JNI_GetDefaultJavaVMInitArgs(void* vmargs);
   jint JNI_CreateJavaVM(JavaVM** p_vm, JNIEnv** p_env, void* vm_args);
@@ -278,6 +279,10 @@ JniInvocationImpl& JniInvocationImpl::GetJniInvocation() {
   return *jni_invocation_;
 }
 
+bool JniInvocationImpl::IsInitialized() {
+  return jni_invocation_ != nullptr;
+}
+
 jint JNI_GetDefaultJavaVMInitArgs(void* vm_args) {
   return JniInvocationImpl::GetJniInvocation().JNI_GetDefaultJavaVMInitArgs(vm_args);
 }
@@ -291,6 +296,10 @@ jint JNI_CreateJavaVM(JavaVM** p_vm, JNIEnv** p_env, void* vm_args) {
 }
 
 jint JNI_GetCreatedJavaVMs(JavaVM** vms, jsize size, jsize* vm_count) {
+  if (!JniInvocationImpl::IsInitialized()) {
+    *vm_count = 0;
+    return JNI_OK;
+  }
   return JniInvocationImpl::GetJniInvocation().JNI_GetCreatedJavaVMs(vms, size, vm_count);
 }
 
