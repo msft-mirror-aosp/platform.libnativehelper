@@ -1,5 +1,13 @@
 // Build the unit tests.
 
+package {
+    // http://go/android-license-faq
+    // A large-scale-change added 'default_applicable_licenses' to import
+    // the below license kinds from "libnativehelper_license":
+    //   SPDX-license-identifier-Apache-2.0
+    default_applicable_licenses: ["libnativehelper_license"],
+}
+
 cc_test {
     name: "libnativehelper_tests",
     test_suites: ["device-tests"],
