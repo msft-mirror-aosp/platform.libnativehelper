@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2021 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package android.libnativehelper.mts;
+#pragma once
 
-import com.android.gtestrunner.GtestRunner;
-import com.android.gtestrunner.TargetLibrary;
+#include <stdbool.h>
+#include <sys/cdefs.h>
 
-import org.junit.runner.RunWith;
+__BEGIN_DECLS
 
-@RunWith(GtestRunner.class)
-@TargetLibrary("nativehelper_mts_jni")
-public class LibnativehelperGTests {}
+void PreventLibnativehelperLazyLoadingForTests();
+
+__END_DECLS

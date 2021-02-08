@@ -20,9 +20,8 @@ package {
     default_applicable_licenses: ["libnativehelper_license"],
 }
 
-android_test {
-    name: "MtsLibnativehelperTestCases",
-    defaults: ["cts_defaults"],
+java_defaults {
+    name: "mts_libnativehelper_defaults",
     compile_multilib: "both",
     libs: [
         "android.test.base.stubs",
@@ -31,14 +30,44 @@ android_test {
         "ctstestrunner-axt",
         "nativetesthelper",
     ],
-    jni_libs: [
-        "libnativehelper_mts_jni",
-    ],
     jni_uses_platform_apis: true,
     sdk_version: "test_current",
-    srcs: ["src/**/*.java"],
+    srcs: ["src/com/android/art/libnativehelper/JniHelpTest.java"],
     test_suites: [
         "device-tests",
         "mts",
+    ],
+}
+
+android_test {
+    name: "MtsLibnativehelperTestCases",
+    defaults: [
+        "cts_defaults",
+        "mts_libnativehelper_defaults",
+    ],
+    jni_libs: [
+        "libnativehelper_mts_jni",
+    ],
+    manifest: "AndroidManifest.xml",
+    srcs: [
+        "src/com/android/art/libnativehelper/LibnativehelperGTests.java",
+    ],
+}
+
+// Same tests as "MtsLibnativehelperTestCases", but with the jni library
+// linked against libnativehelper_lazy.a rather than libnativehelper.so.
+
+android_test {
+    name: "MtsLibnativehelperLazyTestCases",
+    defaults: [
+        "cts_defaults",
+        "mts_libnativehelper_defaults",
+    ],
+    jni_libs: [
+        "libnativehelper_lazy_mts_jni",
+    ],
+    manifest: "AndroidManifest.lazy.xml",
+    srcs: [
+        "src/com/android/art/libnativehelper/LibnativehelperLazyGTests.java",
     ],
 }
