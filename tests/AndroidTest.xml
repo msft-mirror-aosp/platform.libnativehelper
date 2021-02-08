@@ -17,10 +17,15 @@
     <target_preparer class="com.android.tradefed.targetprep.PushFilePreparer">
         <option name="cleanup" value="true" />
         <option name="push" value="libnativehelper_tests->/data/local/tmp/libnativehelper_tests" />
+        <option name="push" value="libnativehelper_lazy_tests->/data/local/tmp/libnativehelper_lazy_tests" />
     </target_preparer>
     <option name="test-suite-tag" value="apct" />
     <test class="com.android.tradefed.testtype.GTest" >
         <option name="native-test-device-path" value="/data/local/tmp" />
         <option name="module-name" value="libnativehelper_tests" />
+    </test>
+    <test class="com.android.tradefed.testtype.GTest" >
+        <option name="native-test-device-path" value="/data/local/tmp" />
+        <option name="module-name" value="libnativehelper_lazy_tests" />
     </test>
 </configuration>

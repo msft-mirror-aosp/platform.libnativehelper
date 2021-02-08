@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.libnativehelper.mts;
+package com.android.art.libnativehelper;
 
 import android.test.AndroidTestCase;
 
@@ -55,10 +55,6 @@ public class JniHelpTest extends AndroidTestCase {
     private static native void assertBufferPointer(Buffer b, long address);
 
     private static native String createString(String input);
-
-    static {
-        System.loadLibrary("nativehelper_mts_jni");
-    }
 
     public void testThrowException() {
         final String message = "Because test";
