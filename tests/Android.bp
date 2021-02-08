@@ -51,6 +51,9 @@ cc_defaults {
         // Enable thread annotations for std::mutex, etc.
         "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
     ],
+    test_options: {
+        unit_test: true,
+    },
 }
 
 cc_test {
