@@ -152,7 +152,11 @@ cc_library_static {
     ],
     apex_available: ["//apex_available:platform"],
     srcs: ["libnativehelper_lazy.c"],
-    version_script: "libnativehelper.map.txt",
+    target: {
+        android: {
+            version_script: "libnativehelper.map.txt",
+        },
+    },
 }
 
 //
