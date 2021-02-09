@@ -8,19 +8,8 @@ package {
     default_applicable_licenses: ["libnativehelper_license"],
 }
 
-cc_test {
-    name: "libnativehelper_tests",
-    test_suites: ["device-tests"],
-    host_supported: true,
-    srcs: [
-        "scoped_local_frame_test.cpp",
-        "scoped_local_ref_test.cpp",
-        "scoped_primitive_array_test.cpp",
-        "libnativehelper_api_test.c",
-        "ExpandableString_test.cpp",
-        "JniInvocation_test.cpp",
-        "JniSafeRegisterNativeMethods_test.cpp",
-    ],
+cc_defaults {
+    name: "libnativehelper_test_defaults",
     cflags: [
         // Base set of cflags used by all things ART.
         "-fno-rtti",
@@ -62,9 +51,37 @@ cc_test {
         // Enable thread annotations for std::mutex, etc.
         "-D_LIBCPP_ENABLE_THREAD_SAFETY_ANNOTATIONS",
     ],
+    test_options: {
+        unit_test: true,
+    },
+}
+
+cc_test {
+    name: "libnativehelper_tests",
+    test_suites: ["device-tests"],
+    host_supported: true,
+    srcs: [
+        "scoped_local_frame_test.cpp",
+        "scoped_local_ref_test.cpp",
+        "scoped_primitive_array_test.cpp",
+        "libnativehelper_api_test.c",
+        "ExpandableString_test.cpp",
+        "JniInvocation_test.cpp",
+        "JniSafeRegisterNativeMethods_test.cpp",
+    ],
     // Link to the non-stub version of the library to access some internal
     // functions.
     bootstrap: true,
     shared_libs: ["libnativehelper"],
+    tidy: true,
+}
+
+cc_test {
+    name: "libnativehelper_lazy_tests",
+    test_suites: ["device-tests"],
+    host_supported: true,
+    srcs: ["libnativehelper_lazy_test.cpp"],
+    bootstrap: true,
+    static_libs: ["libnativehelper_lazy"],
     tidy: true,
 }
