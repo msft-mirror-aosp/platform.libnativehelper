@@ -23,7 +23,7 @@
 
     <instrumentation android:name="androidx.test.runner.AndroidJUnitRunner"
                      android:targetPackage="com.android.art.libnativehelper"
-                     android:label="MTS tests for libnativehelper">
+                     android:label="MTS tests for libnativehelper_lazy">
         <meta-data android:name="listener"
             android:value="com.android.cts.runner.CtsTestRunListener" />
     </instrumentation>

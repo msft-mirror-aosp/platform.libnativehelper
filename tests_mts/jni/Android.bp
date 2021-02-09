@@ -20,8 +20,8 @@ package {
     default_applicable_licenses: ["libnativehelper_license"],
 }
 
-cc_library_shared {
-    name: "libnativehelper_mts_jni",
+cc_defaults {
+    name: "libnativehelper_jni_defaults",
     cflags: [
         "-Wall",
         "-Werror",
@@ -32,16 +32,25 @@ cc_library_shared {
         "jni_helper_jni.cpp",
         "libnativehelper_test.cpp",
     ],
-    shared_libs: [
-        "libnativehelper",
-        "liblog",
-    ],
-    stl: "c++_static",
+    shared_libs: ["liblog"],
     static_libs: ["libgmock_ndk"],
+    stl: "c++_static",
     // libnativetesthelper_jni depends on libnativehelper_compat_libc++.
     // At the time of writing there is no duplicated global state in the
     // libnativehelper sources between these functions. Should this change,
     // then there could be ODR problems here.
     whole_static_libs: ["libnativetesthelper_jni"],
     tidy: true,
+}
+
+cc_library_shared {
+    name: "libnativehelper_mts_jni",
+    defaults: ["libnativehelper_jni_defaults"],
+    shared_libs: ["libnativehelper"],
+}
+
+cc_library_shared {
+    name: "libnativehelper_lazy_mts_jni",
+    defaults: ["libnativehelper_jni_defaults"],
+    static_libs: ["libnativehelper_lazy"],
 }
