@@ -238,7 +238,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
                                createString),
     };
     int rc = jniRegisterNativeMethods(env,
-                                      "android/libnativehelper/mts/JniHelpTest",
+                                      "com/android/art/libnativehelper/JniHelpTest",
                                       methods,
                                       std::size(methods));
     if (rc != JNI_OK) return rc;
