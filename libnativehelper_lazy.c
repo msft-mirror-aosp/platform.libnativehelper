@@ -107,7 +107,8 @@ static bool IsLibnativehelperLoaded() {
 
 static void BindSymbol(void* handle, const char* name, enum MethodIndex index) {
     g_Methods[index] = dlsym(handle, name);
-    LOG_FATAL_IF(*symbol == NULL, "Failed to find symbol in libnativehelper.so: ", name);
+    LOG_FATAL_IF(*symbol == NULL,
+                 "Failed to find symbol '%s' in libnativehelper.so: %s", name, dlerror());
 }
 
 static void InitializeOnce() {
@@ -168,14 +169,18 @@ static void EnsureInitialized() {
 }
 
 #define INVOKE_METHOD(name, method_type, args...)       \
-    EnsureInitialized();                                \
-    void* method = g_Methods[k_ ## name];               \
-    return ((method_type) method)(args);
+    do {                                                \
+        EnsureInitialized();                            \
+        void* method = g_Methods[k_ ## name];           \
+        return ((method_type) method)(args);            \
+    } while (0)
 
 #define INVOKE_VOID_METHOD(name, method_type, args...)  \
-    EnsureInitialized();                                \
-    void* method = g_Methods[k_ ## name];               \
-    ((method_type) method)(args);
+    do {                                                \
+        EnsureInitialized();                            \
+        void* method = g_Methods[k_ ## name];           \
+        ((method_type) method)(args);                   \
+    } while (0)
 
 //
 // Forwarding for methods in file_descriptor_jni.h.

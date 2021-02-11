@@ -66,7 +66,6 @@ android_test {
     jni_libs: [
         "libnativehelper_lazy_mts_jni",
     ],
-    manifest: "AndroidManifest.lazy.xml",
     srcs: [
         "src/com/android/art/libnativehelper/LibnativehelperLazyGTests.java",
     ],
