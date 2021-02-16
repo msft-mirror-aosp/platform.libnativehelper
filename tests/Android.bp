@@ -55,31 +55,45 @@ cc_defaults {
     test_options: {
         unit_test: true,
     },
-    test_suites: ["device-tests"],
     tidy: true,
 }
 
 cc_test {
     name: "libnativehelper_tests",
     defaults: ["libnativehelper_test_defaults"],
+    test_suites: ["device-tests"],
     srcs: [
         "scoped_local_frame_test.cpp",
         "scoped_local_ref_test.cpp",
         "scoped_primitive_array_test.cpp",
         "libnativehelper_api_test.c",
-        "ExpandableString_test.cpp",
-        "JniInvocation_test.cpp",
         "JniSafeRegisterNativeMethods_test.cpp",
     ],
-    // Link to the non-stub version of the library to access some internal
-    // functions.
-    bootstrap: true,
     shared_libs: ["libnativehelper"],
 }
 
 cc_test {
     name: "libnativehelper_lazy_tests",
     defaults: ["libnativehelper_test_defaults"],
+    test_suites: ["device-tests"],
     srcs: ["libnativehelper_lazy_test.cpp"],
     static_libs: ["libnativehelper_lazy"],
+}
+
+// Tests for internal functions that aren't present in the APEX stub API. Use
+// `bootstrap:true` to bypass the stub library. This test won't link when
+// prebuilts are preferred, because we cannot link against the source variant
+// then.
+// TODO(b/180107266): Enable in TEST_MAPPING. Also use a better way than
+// `bootstrap:true` - `test_for` ought to work but fails because the test is
+// host enabled so host variants of the APEXes are expected.
+cc_test {
+    name: "libnativehelper_internal_tests",
+    defaults: ["libnativehelper_test_defaults"],
+    srcs: [
+        "ExpandableString_test.cpp",
+        "JniInvocation_test.cpp",
+    ],
+    bootstrap: true,
+    shared_libs: ["libnativehelper"],
 }
