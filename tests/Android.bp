@@ -89,7 +89,10 @@ cc_test {
 // host enabled so host variants of the APEXes are expected.
 cc_test {
     name: "libnativehelper_internal_tests",
-    defaults: ["libnativehelper_test_defaults"],
+    defaults: [
+        "art_module_source_build_defaults",
+        "libnativehelper_test_defaults",
+    ],
     srcs: [
         "ExpandableString_test.cpp",
         "JniInvocation_test.cpp",
