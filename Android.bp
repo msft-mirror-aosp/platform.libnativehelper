@@ -95,6 +95,7 @@ cc_library_headers {
         "com.android.art",
         "com.android.art.debug",
     ],
+    min_sdk_version: "S",
 }
 
 cc_library_shared {
@@ -133,6 +134,7 @@ cc_library_shared {
         "com.android.art",
         "com.android.art.debug",
     ],
+    min_sdk_version: "S",
 }
 
 // Lazy loading version of libnativehelper that can be used by code
