@@ -106,14 +106,15 @@ static bool IsLibnativehelperLoaded() {
 //
 
 static void BindSymbol(void* handle, const char* name, enum MethodIndex index) {
-    g_Methods[index] = dlsym(handle, name);
-    LOG_FATAL_IF(*symbol == NULL,
-                 "Failed to find symbol '%s' in libnativehelper.so: %s", name, dlerror());
+    void* symbol = dlsym(handle, name);
+    LOG_ALWAYS_FATAL_IF(symbol == NULL,
+                        "Failed to find symbol '%s' in libnativehelper.so: %s", name, dlerror());
+    g_Methods[index] = symbol;
 }
 
 static void InitializeOnce() {
     void* handle = LoadLibnativehelper(RTLD_NOW);
-    LOG_FATAL_IF(handle == NULL, "Failed to load libnativehelper.so: %s", dlerror());
+    LOG_ALWAYS_FATAL_IF(handle == NULL, "Failed to load libnativehelper.so: %s", dlerror());
 
 #undef BIND_SYMBOL
 #define BIND_SYMBOL(name) BindSymbol(handle, #name, k_ ## name);
@@ -158,8 +159,8 @@ static void InitializeOnce() {
 
     // Check every symbol is bound.
     for (int i = 0; i < k_MethodCount; ++i) {
-        LOG_FATAL_IF(g_Methods[i] == NULL,
-                    "Uninitialized method in libnativehelper_lazy at index: %d", i);
+        LOG_ALWAYS_FATAL_IF(g_Methods[i] == NULL,
+                            "Uninitialized method in libnativehelper_lazy at index: %d", i);
     }
 }
 

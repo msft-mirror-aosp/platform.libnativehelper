@@ -77,6 +77,7 @@ cc_test {
     defaults: ["libnativehelper_test_defaults"],
     test_suites: ["device-tests"],
     srcs: ["libnativehelper_lazy_test.cpp"],
+    shared_libs: ["liblog"],
     static_libs: ["libnativehelper_lazy"],
 }
 
