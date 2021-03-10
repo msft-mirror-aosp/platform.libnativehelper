@@ -33,9 +33,7 @@ class LibnativehelperLazyTest : public ::testing::Test {
     }
 };
 
-// libnativehelper_lazy uses LOG_FATAL_IF and gtest doesn't pick the pattern there for comparing
-// in EXPECT_DEATH on host.
-static const char* kLoadFailed = "";
+static const char* kLoadFailed = "Failed to load libnativehelper.so";
 
 TEST_F(LibnativehelperLazyTest, NoLibnativehelperIsForJNIHelp) {
   C_JNIEnv* env = NULL;
