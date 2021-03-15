@@ -16,6 +16,7 @@
 
 #include "include/nativehelper/JNIHelp.h"
 
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -233,6 +234,84 @@ static void DiscardPendingException(JNIEnv* env, const char* className) {
     (*env)->DeleteLocalRef(env, exception);
 }
 
+static int ThrowException(JNIEnv* env, const char* className, const char* ctorSig, ...) {
+    int status = -1;
+    jclass exceptionClass = NULL;
+
+    va_list args;
+    va_start(args, ctorSig);
+
+    DiscardPendingException(env, className);
+
+    {
+        /* We want to clean up local references before returning from this function, so,
+         * regardless of return status, the end block must run. Have the work done in a
+         * nested block to avoid using any uninitialized variables in the end block. */
+        exceptionClass = (*env)->FindClass(env, className);
+        if (exceptionClass == NULL) {
+            ALOGE("Unable to find exception class %s", className);
+            /* an exception, most likely ClassNotFoundException, will now be pending */
+            goto end;
+        }
+
+        jmethodID init = (*env)->GetMethodID(env, exceptionClass, "<init>", ctorSig);
+        if(init == NULL) {
+            ALOGE("Failed to find constructor for '%s' '%s'", className, ctorSig);
+            goto end;
+        }
+
+        jobject instance = (*env)->NewObjectV(env, exceptionClass, init, args);
+        if (instance == NULL) {
+            ALOGE("Failed to construct '%s'", className);
+            goto end;
+        }
+
+        if ((*env)->Throw(env, (jthrowable)instance) != JNI_OK) {
+            ALOGE("Failed to throw '%s'", className);
+            /* an exception, most likely OOM, will now be pending */
+            goto end;
+        }
+
+        /* everything worked fine, just update status to success and clean up */
+        status = 0;
+    }
+
+end:
+    va_end(args);
+    if (exceptionClass != NULL) {
+        (*env)->DeleteLocalRef(env, exceptionClass);
+    }
+    return status;
+}
+
+static jstring CreateExceptionMsg(JNIEnv* env, const char* msg) {
+    jstring detailMessage = (*env)->NewStringUTF(env, msg);
+    if (detailMessage == NULL) {
+        /* Not really much we can do here. We're probably dead in the water,
+           but let's try to stumble on... */
+        (*env)->ExceptionClear(env);
+    }
+    return detailMessage;
+}
+
+/* Helper macro to deal with conversion of the exception message from a C string
+ * to jstring.
+ *
+ * This is useful because most exceptions have a message as the first parameter
+ * and delegating the conversion to all the callers of ThrowException results in
+ * code duplication. However, since we try to allow variable number of arguments
+ * for the exception constructor we'd either need to do the conversion inside
+ * the macro, or manipulate the va_list to replace the C string to a jstring.
+ * This seems like the cleaner solution.
+ */
+#define THROW_EXCEPTION_WITH_MESSAGE(env, className, ctorSig, msg, ...) ({                 \
+    jstring _detailMessage = CreateExceptionMsg(env, msg);                                 \
+    int _status = ThrowException(env, className, ctorSig, _detailMessage, ## __VA_ARGS__); \
+    if (_detailMessage != NULL) {                                                          \
+        (*env)->DeleteLocalRef(env, _detailMessage);                                       \
+    }                                                                                      \
+    _status; })
+
 //
 // JNIHelp external API
 //
@@ -277,24 +356,7 @@ void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowable thro
 }
 
 int jniThrowException(JNIEnv* env, const char* className, const char* message) {
-    DiscardPendingException(env, className);
-
-    jclass exceptionClass = (*env)->FindClass(env, className);
-    if (exceptionClass == NULL) {
-        ALOGE("Unable to find exception class %s", className);
-        /* ClassNotFoundException now pending */
-        return -1;
-    }
-
-    int status = 0;
-    if ((*env)->ThrowNew(env, exceptionClass, message) != JNI_OK) {
-        ALOGE("Failed throwing '%s' '%s'", className, message);
-        /* an exception, most likely OOM, will now be pending */
-        status = -1;
-    }
-    (*env)->DeleteLocalRef(env, exceptionClass);
-
-    return status;
+    return THROW_EXCEPTION_WITH_MESSAGE(env, className, "(Ljava/lang/String;)V", message);
 }
 
 int jniThrowExceptionFmt(JNIEnv* env, const char* className, const char* fmt, va_list args) {
@@ -311,10 +373,15 @@ int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
     return jniThrowException(env, "java/lang/RuntimeException", msg);
 }
 
-int jniThrowIOException(JNIEnv* env, int errnum) {
+int jniThrowIOException(JNIEnv* env, int errno_value) {
     char buffer[80];
-    const char* message = platformStrError(errnum, buffer, sizeof(buffer));
+    const char* message = platformStrError(errno_value, buffer, sizeof(buffer));
     return jniThrowException(env, "java/io/IOException", message);
+}
+
+int jniThrowErrnoException(JNIEnv* env, const char* functionName, int errno_value) {
+    return THROW_EXCEPTION_WITH_MESSAGE(env, "android/system/ErrnoException",
+            "(Ljava/lang/String;I)V", functionName, errno_value);
 }
 
 jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
