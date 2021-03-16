@@ -29,6 +29,8 @@ import java.nio.IntBuffer;
 import java.nio.FloatBuffer;
 import java.nio.DoubleBuffer;
 
+import android.system.ErrnoException;
+
 import org.junit.Assert;
 
 public class JniHelpTest extends AndroidTestCase {
@@ -39,6 +41,7 @@ public class JniHelpTest extends AndroidTestCase {
     private static native void throwNullPointerException(String message);
     private static native void throwRuntimeException(String message);
     private static native void throwIOException(int cause) throws IOException;
+    private static native void throwErrnoException(String fileName, int cause) throws ErrnoException;
     private static native void logException(Throwable throwable);
 
     private static native FileDescriptor fileDescriptorCreate(int unixFd);
@@ -116,6 +119,20 @@ public class JniHelpTest extends AndroidTestCase {
         assertNotNull(s2);
 
         assertFalse(s1.equals(s2));
+    }
+
+    public void testErrnoException() {
+        final String functionName = "execve";
+        final int err = 42;
+        try {
+            throwErrnoException(functionName, err);
+            fail("Unreachable");
+        } catch (ErrnoException e) {
+            // The message contains the function name as well as the string for the errno, just only
+            // check the first part of the message
+            assertTrue("Function name", e.getMessage().startsWith(functionName));
+            assertEquals(err, e.errno);
+        }
     }
 
     public void testLogException() {
