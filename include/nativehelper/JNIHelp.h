@@ -88,9 +88,14 @@ int jniThrowNullPointerException(C_JNIEnv* env, const char* msg);
 int jniThrowRuntimeException(C_JNIEnv* env, const char* msg);
 
 /*
- * Throw a java.io.IOException, generating the message from errno.
+ * Throw a java.io.IOException, generating the message from the given errno value.
  */
-int jniThrowIOException(C_JNIEnv* env, int errnum);
+int jniThrowIOException(C_JNIEnv* env, int errno_value);
+
+/*
+ * Throw an android.system.ErrnoException, with the given function name and errno value.
+ */
+int jniThrowErrnoException(C_JNIEnv* env, const char* functionName, int errno_value);
 
 /*
  * Returns a Java String object created from UTF-16 data either from jchar or,
@@ -141,6 +146,10 @@ inline int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
 
 inline int jniThrowIOException(JNIEnv* env, int errnum) {
     return jniThrowIOException(&env->functions, errnum);
+}
+
+inline int jniThrowErrnoException(JNIEnv* env, const char* functionName, int errnum) {
+    return jniThrowErrnoException(&env->functions, functionName, errnum);
 }
 
 inline jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
