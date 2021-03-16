@@ -80,6 +80,11 @@ static void throwIOException(JNIEnv* env, jclass /*clazz*/, jint cause) {
     jniThrowIOException(env, cause);
 }
 
+static void throwErrnoException(JNIEnv* env, jclass /*clazz*/, jstring functionName, jint cause) {
+    ScopedUtfChars m(env, functionName);
+    jniThrowErrnoException(env, m.c_str(), cause);
+}
+
 static void logException(JNIEnv* env, jclass /*clazz*/, jthrowable throwable) {
     jniLogException(env, ANDROID_LOG_VERBOSE, __FILE__, throwable);
 }
@@ -197,6 +202,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         MAKE_JNI_NATIVE_METHOD("throwIOException",
                                "(I)V",
                                throwIOException),
+        MAKE_JNI_NATIVE_METHOD("throwErrnoException",
+                               "(Ljava/lang/String;I)V",
+                               throwErrnoException),
         MAKE_JNI_NATIVE_METHOD("logException",
                                "(Ljava/lang/Throwable;)V",
                                logException),

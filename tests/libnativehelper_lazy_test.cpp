@@ -45,6 +45,7 @@ TEST_F(LibnativehelperLazyTest, NoLibnativehelperIsForJNIHelp) {
   EXPECT_DEATH(jniThrowIOException(env, 1), kLoadFailed);
   EXPECT_DEATH(jniThrowNullPointerException(env, "msg"), kLoadFailed);
   EXPECT_DEATH(jniThrowRuntimeException(env, "msg"), kLoadFailed);
+  EXPECT_DEATH(jniThrowErrnoException(env, "fn", 1), kLoadFailed);
 }
 
 TEST_F(LibnativehelperLazyTest, NoLibnativehelperIsForJNIPlatformHelp) {
