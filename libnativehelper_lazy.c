@@ -39,8 +39,10 @@
 enum MethodIndex {
     // NDK file descriptor API in file_descriptor_jni.h.
     k_AFileDescriptor_create,
-    k_AFileDescriptor_getFD,
-    k_AFileDescriptor_setFD,
+    k_AFileDescriptor_getFd,
+    k_AFileDescriptor_setFd,
+    k_AFileDescriptor_getFD,  // Deprecated pending removal (b/185256332).
+    k_AFileDescriptor_setFD,  // Deprecated pending removal (b/185256332).
 
     // JNI_Invocation API declared in jni.h.
     k_JNI_CreateJavaVM,
@@ -122,8 +124,10 @@ static void InitializeOnce() {
 
     // NDK file descriptor API in file_descriptor_jni.h.
     BIND_SYMBOL(AFileDescriptor_create);
-    BIND_SYMBOL(AFileDescriptor_getFD);
-    BIND_SYMBOL(AFileDescriptor_setFD);
+    BIND_SYMBOL(AFileDescriptor_getFd);
+    BIND_SYMBOL(AFileDescriptor_setFd);
+    BIND_SYMBOL(AFileDescriptor_getFD);  // Deprecated pending removal (b/185256332).
+    BIND_SYMBOL(AFileDescriptor_setFD);  // Deprecated pending removal (b/185256332).
 
     // JNI_Invocation API declared in jni.h.
     BIND_SYMBOL(JNI_CreateJavaVM);
@@ -192,6 +196,16 @@ static void EnsureInitialized() {
 jobject AFileDescriptor_create(JNIEnv* env) {
     typedef jobject (*M)(JNIEnv*);
     INVOKE_METHOD(AFileDescriptor_create, M, env);
+}
+
+int AFileDescriptor_getFd(JNIEnv* env, jobject fileDescriptor) {
+    typedef int (*M)(JNIEnv*, jobject);
+    INVOKE_METHOD(AFileDescriptor_getFd, M, env, fileDescriptor);
+}
+
+void AFileDescriptor_setFd(JNIEnv* env, jobject fileDescriptor, int fd) {
+    typedef void (*M)(JNIEnv*, jobject, int);
+    INVOKE_VOID_METHOD(AFileDescriptor_setFd, M, env, fileDescriptor, fd);
 }
 
 int AFileDescriptor_getFD(JNIEnv* env, jobject fileDescriptor) {
