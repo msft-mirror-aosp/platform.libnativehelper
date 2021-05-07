@@ -4,8 +4,10 @@ LIBNATIVEHELPER_S { # introduced=S
     AFileDescriptor_create;
     AFileDescriptor_getFd;
     AFileDescriptor_setFd;
-    AFileDescriptor_getFD;  // Deprecated pending removal (b/185256332).
-    AFileDescriptor_setFD;  // Deprecated pending removal (b/185256332).
+    # AFileDescriptor_getFD is deprecated pending removal (b/185256332).
+    AFileDescriptor_getFD;
+    # AFileDescriptor_setFD is deprecated pending removal (b/185256332).
+    AFileDescriptor_setFD;
 
     # JNI Invocation methods available to platform and apps.
     JNI_CreateJavaVM;
