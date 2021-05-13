@@ -41,18 +41,7 @@ JNIEXPORT int AFileDescriptor_getFd(JNIEnv* env, jobject fileDescriptor) {
     return (*env)->GetIntField(env, fileDescriptor, JniConstants_FileDescriptor_descriptor(env));
 }
 
-JNIEXPORT int AFileDescriptor_getFD(JNIEnv* env, jobject fileDescriptor) {
-    // Method deprecated pending removal (b/185256332).
-    return AFileDescriptor_getFd(env, fileDescriptor);
-}
-
 JNIEXPORT void AFileDescriptor_setFd(JNIEnv* env, jobject fileDescriptor, int fd) {
     EnsureArgumentIsFileDescriptor(env, fileDescriptor);
     (*env)->SetIntField(env, fileDescriptor, JniConstants_FileDescriptor_descriptor(env), fd);
-}
-
-
-JNIEXPORT void AFileDescriptor_setFD(JNIEnv* env, jobject fileDescriptor, int fd) {
-    // Method deprecated pending removal (b/185256332).
-    AFileDescriptor_setFd(env, fileDescriptor, fd);
 }
