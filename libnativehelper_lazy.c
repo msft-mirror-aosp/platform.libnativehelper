@@ -48,13 +48,10 @@ enum MethodIndex {
     k_JNI_GetDefaultJavaVMInitArgs,
 
     // Methods in JNIPlatformHelp.h.
-    k_jniCreateFileDescriptor,
-    k_jniGetFDFromFileDescriptor,
     k_jniGetNioBufferBaseArray,
     k_jniGetNioBufferBaseArrayOffset,
     k_jniGetNioBufferFields,
     k_jniGetNioBufferPointer,
-    k_jniSetFileDescriptorOfFD,
     k_jniUninitializeConstants,
 
     // Methods in JniInvocation.h.
@@ -120,13 +117,10 @@ static void InitializeOnce() {
     BIND_SYMBOL(JNI_GetDefaultJavaVMInitArgs);
 
     // Methods in JNIPlatformHelp.h.
-    BIND_SYMBOL(jniCreateFileDescriptor);
-    BIND_SYMBOL(jniGetFDFromFileDescriptor);
     BIND_SYMBOL(jniGetNioBufferBaseArray);
     BIND_SYMBOL(jniGetNioBufferBaseArrayOffset);
     BIND_SYMBOL(jniGetNioBufferFields);
     BIND_SYMBOL(jniGetNioBufferPointer);
-    BIND_SYMBOL(jniSetFileDescriptorOfFD);
     BIND_SYMBOL(jniUninitializeConstants);
 
     // Methods in JniInvocation.h.
@@ -229,16 +223,6 @@ jint JNI_GetCreatedJavaVMs(JavaVM** p_vm, jsize vm_max, jsize* p_vm_count) {
 // Forwarding for methods in JNIPlatformHelp.h.
 //
 
-jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    typedef jobject (*M)(JNIEnv*, int);
-    INVOKE_METHOD(jniCreateFileDescriptor, M, env, fd);
-}
-
-int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    typedef int (*M)(JNIEnv*, jobject);
-    INVOKE_METHOD(jniGetFDFromFileDescriptor, M, env, fileDescriptor);
-}
-
 jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
     typedef jarray (*M)(JNIEnv*, jobject);
     INVOKE_METHOD(jniGetNioBufferBaseArray, M, env, nioBuffer);
@@ -259,11 +243,6 @@ jlong jniGetNioBufferFields(JNIEnv* env, jobject nioBuffer,
 jlong jniGetNioBufferPointer(JNIEnv* env, jobject nioBuffer) {
     typedef jlong (*M)(JNIEnv*, jobject);
     INVOKE_METHOD(jniGetNioBufferPointer, M, env, nioBuffer);
-}
-
-void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    typedef void (*M)(JNIEnv*, jobject, int);
-    INVOKE_VOID_METHOD(jniSetFileDescriptorOfFD, M, env, fileDescriptor, value);
 }
 
 void jniUninitializeConstants() {
