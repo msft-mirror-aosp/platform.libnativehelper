@@ -30,24 +30,6 @@
 
 namespace {
 
-void AssertionError(JNIEnv* env, const char* format, ...) {
-    // There is some awkwardness with java/lang/AssertionError. It cannot be directly thrown
-    // by jniThrowException or the JNI ThrowNew methods because AssertionError(String) is not
-    // public so we instead use the AssertionError(String, Throwable) constructor.
-    va_list args;
-    va_start(args, format);
-    char messageBuffer[256];
-    vsnprintf(messageBuffer, sizeof(messageBuffer), format, args);
-    va_end(args);
-
-    ScopedLocalRef<jclass> jlaeClass(env, env->FindClass("java/lang/AssertionError"));
-    jmethodID init =
-        env->GetMethodID(jlaeClass.get(), "<init>", "(Ljava/lang/String;Ljava/lang/Throwable;)V");
-    ScopedLocalRef<jstring> message(env, env->NewStringUTF(messageBuffer));
-    jobject jlae = env->NewObject(jlaeClass.get(), init, message.get(), nullptr);
-    env->Throw(reinterpret_cast<jthrowable>(jlae));
-}
-
 static void throwException(JNIEnv* env, jclass /*clazz*/, jstring className, jstring message) {
     ScopedUtfChars c(env, className);
     ScopedUtfChars m(env, message);
@@ -101,78 +83,6 @@ static void fileDescriptorSetFD(JNIEnv* env, jclass /*clazz*/, jobject jiofd, ji
     jniSetFileDescriptorOfFD(env, jiofd, unix_fd);
 }
 
-static jobject allocateDirectNonHeapBuffer(JNIEnv* env, jclass /*clazz*/, jint length) {
-    static uint8_t raw_memory[4096];
-    if (length < 0 || length > sizeof(raw_memory)) {
-        return nullptr;
-    }
-    return env->NewDirectByteBuffer(&raw_memory, length);
-}
-
-static void
-assertBufferBaseArrayOffsetBytes(JNIEnv* env, jclass /*clazz*/, jobject jnb, jint offset) {
-    int actualOffset = jniGetNioBufferBaseArrayOffset(env, jnb);
-    if (actualOffset != offset) {
-        AssertionError(env,
-                       "Buffer offset incorrect (expected %d, actual %d)",
-                       offset,
-                       actualOffset);
-    }
-}
-
-static void assertBufferPosition(JNIEnv* env, jclass /*clazz*/, jobject jnb, jint position) {
-    int actualPosition, actualLimit, actualElementSizeShift;
-    jniGetNioBufferFields(env, jnb, &actualPosition, &actualLimit, &actualElementSizeShift);
-    if (actualPosition != position) {
-        AssertionError(env,
-                       "Buffer position incorrect (expected %d, actual %d)",
-                       position,
-                       actualPosition);
-    }
-}
-
-static void assertBufferLimit(JNIEnv* env, jclass /*clazz*/, jobject jnb, jint limit) {
-    int actualPosition, actualLimit, actualElementSizeShift;
-    jniGetNioBufferFields(env, jnb, &actualPosition, &actualLimit, &actualElementSizeShift);
-    if (actualLimit != limit) {
-        AssertionError(env,
-                       "Buffer limit incorrect (expected %d, actual %d)",
-                       limit,
-                       actualLimit);
-    }
-}
-
-static void assertBufferElementSizeShift(JNIEnv* env, jclass /*clazz*/, jobject jnb, jint ess) {
-    int actualPosition, actualLimit, actualElementSizeShift;
-    jniGetNioBufferFields(env, jnb, &actualPosition, &actualLimit, &actualElementSizeShift);
-    if (actualElementSizeShift != ess) {
-        AssertionError(env,
-                       "Buffer element size shift incorrect (expected %d, actual %d)",
-                       ess,
-                       actualElementSizeShift);
-    }
-}
-
-static jlong getBufferBaseAddress(JNIEnv* env, jclass /*clazz*/, jobject jnb) {
-    int actualPosition, actualLimit, actualElementSizeShift;
-    return jniGetNioBufferFields(env, jnb, &actualPosition, &actualLimit, &actualElementSizeShift);
-}
-
-static jlong getDirectBufferAddress(JNIEnv* env, jclass /*clazz*/, jobject jnb) {
-    void* directBufferAddress = env->GetDirectBufferAddress(jnb);
-    return reinterpret_cast<jlong>(directBufferAddress);
-}
-
-static void assertBufferPointer(JNIEnv* env, jclass /*clazz*/, jobject jnb, jlong pointer) {
-    jlong actualPointer = jniGetNioBufferPointer(env, jnb);
-    if (actualPointer != pointer) {
-        AssertionError(env,
-                      "Buffer pointer incorrect (expected %p, actual %p)",
-                       reinterpret_cast<void*>(pointer),
-                       reinterpret_cast<void*>(actualPointer));
-    }
-}
-
 static jstring createString(JNIEnv* env, jclass /*clazz*/, jstring value) {
     ScopedStringChars ssc(env, value);
     return jniCreateString(env, ssc.get(), ssc.size());
@@ -217,30 +127,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         MAKE_JNI_NATIVE_METHOD("fileDescriptorSetFD",
                                "(Ljava/io/FileDescriptor;I)V",
                                fileDescriptorSetFD),
-        MAKE_JNI_NATIVE_METHOD("allocateDirectNonHeapBuffer",
-                               "(I)Ljava/nio/ByteBuffer;",
-                               allocateDirectNonHeapBuffer),
-        MAKE_JNI_NATIVE_METHOD("assertBufferBaseArrayOffsetBytes",
-                               "(Ljava/nio/Buffer;I)V",
-                               assertBufferBaseArrayOffsetBytes),
-        MAKE_JNI_NATIVE_METHOD("assertBufferPosition",
-                               "(Ljava/nio/Buffer;I)V",
-                               assertBufferPosition),
-        MAKE_JNI_NATIVE_METHOD("assertBufferLimit",
-                               "(Ljava/nio/Buffer;I)V",
-                               assertBufferLimit),
-        MAKE_JNI_NATIVE_METHOD("assertBufferElementSizeShift",
-                               "(Ljava/nio/Buffer;I)V",
-                               assertBufferElementSizeShift),
-        MAKE_JNI_NATIVE_METHOD("getBufferBaseAddress",
-                               "(Ljava/nio/Buffer;)J",
-                               getBufferBaseAddress),
-        MAKE_JNI_NATIVE_METHOD("getDirectBufferAddress",
-                               "(Ljava/nio/Buffer;)J",
-                               getDirectBufferAddress),
-        MAKE_JNI_NATIVE_METHOD("assertBufferPointer",
-                               "(Ljava/nio/Buffer;J)V",
-                               assertBufferPointer),
         MAKE_JNI_NATIVE_METHOD("createString",
                                "(Ljava/lang/String;)Ljava/lang/String;",
                                createString),
