@@ -37,13 +37,10 @@ static const char* kLoadFailed = "Failed to load libnativehelper.so";
 
 TEST_F(LibnativehelperLazyTest, NoLibnativehelperIsForJNIPlatformHelp) {
   C_JNIEnv* env = NULL;
-  EXPECT_DEATH(jniCreateFileDescriptor(env, 0), kLoadFailed);
-  EXPECT_DEATH(jniGetFDFromFileDescriptor(env, NULL), kLoadFailed);
   EXPECT_DEATH(jniGetNioBufferBaseArray(env, NULL), kLoadFailed);
   EXPECT_DEATH(jniGetNioBufferBaseArrayOffset(env, NULL), kLoadFailed);
   EXPECT_DEATH(jniGetNioBufferFields(env, NULL, NULL, NULL, NULL), kLoadFailed);
   EXPECT_DEATH(jniGetNioBufferPointer(env, NULL), kLoadFailed);
-  EXPECT_DEATH(jniSetFileDescriptorOfFD(env, NULL, 1), kLoadFailed);
   EXPECT_DEATH(jniUninitializeConstants(), kLoadFailed);
 }
 
