@@ -47,17 +47,6 @@ enum MethodIndex {
     k_JNI_GetCreatedJavaVMs,
     k_JNI_GetDefaultJavaVMInitArgs,
 
-    // Methods in JNIHelp.h.
-    k_jniCreateString,
-    k_jniLogException,
-    k_jniRegisterNativeMethods,
-    k_jniThrowErrnoException,
-    k_jniThrowException,
-    k_jniThrowExceptionFmt,
-    k_jniThrowIOException,
-    k_jniThrowNullPointerException,
-    k_jniThrowRuntimeException,
-
     // Methods in JNIPlatformHelp.h.
     k_jniCreateFileDescriptor,
     k_jniGetFDFromFileDescriptor,
@@ -129,17 +118,6 @@ static void InitializeOnce() {
     BIND_SYMBOL(JNI_CreateJavaVM);
     BIND_SYMBOL(JNI_GetCreatedJavaVMs);
     BIND_SYMBOL(JNI_GetDefaultJavaVMInitArgs);
-
-    // Methods in JNIHelp.h.
-    BIND_SYMBOL(jniCreateString);
-    BIND_SYMBOL(jniLogException);
-    BIND_SYMBOL(jniRegisterNativeMethods);
-    BIND_SYMBOL(jniThrowErrnoException);
-    BIND_SYMBOL(jniThrowException);
-    BIND_SYMBOL(jniThrowExceptionFmt);
-    BIND_SYMBOL(jniThrowIOException);
-    BIND_SYMBOL(jniThrowNullPointerException);
-    BIND_SYMBOL(jniThrowRuntimeException);
 
     // Methods in JNIPlatformHelp.h.
     BIND_SYMBOL(jniCreateFileDescriptor);
@@ -245,58 +223,6 @@ jint JNI_GetCreatedJavaVMs(JavaVM** p_vm, jsize vm_max, jsize* p_vm_count) {
         return JNI_OK;
     }
     INVOKE_METHOD(JNI_GetCreatedJavaVMs, M, p_vm, vm_max, p_vm_count);
-}
-
-//
-// Forwarding for methods in JNIHelp.h.
-//
-
-jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
-    typedef jstring (*M)(JNIEnv*, const jchar*, jsize);
-    INVOKE_METHOD(jniCreateString, M, env, unicodeChars, len);
-}
-
-void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowable exception) {
-    typedef void (*M)(JNIEnv*, int, const char*, jthrowable);
-    INVOKE_VOID_METHOD(jniLogException, M, env, priority, tag, exception);
-}
-
-int jniRegisterNativeMethods(JNIEnv* env,
-                             const char* className,
-                             const JNINativeMethod* gMethods,
-                             int numMethods) {
-    typedef int (*M)(JNIEnv*, const char*, const JNINativeMethod*, int numMethods);
-    INVOKE_METHOD(jniRegisterNativeMethods, M, env, className, gMethods, numMethods);
-}
-
-int jniThrowErrnoException(JNIEnv* env, const char* functionName, int errnum) {
-    typedef int (*M)(JNIEnv*, const char*, int);
-    INVOKE_METHOD(jniThrowErrnoException, M, env, functionName, errnum);
-}
-
-int jniThrowException(JNIEnv* env, const char* className, const char* msg) {
-    typedef int (*M)(JNIEnv*, const char*, const char*);
-    INVOKE_METHOD(jniThrowException, M, env, className, msg);
-}
-
-int jniThrowExceptionFmt(JNIEnv* env, const char* className, const char* fmt, va_list args) {
-    typedef int (*M)(JNIEnv*, const char*, const char*, va_list);
-    INVOKE_METHOD(jniThrowExceptionFmt, M, env, className, fmt, args);
-}
-
-int jniThrowIOException(JNIEnv* env, int errnum) {
-    typedef int (*M)(JNIEnv*, int);
-    INVOKE_METHOD(jniThrowIOException, M, env, errnum);
-}
-
-int jniThrowNullPointerException(JNIEnv* env, const char* msg) {
-    typedef int (*M)(JNIEnv*, const char*);
-    INVOKE_METHOD(jniThrowNullPointerException, M, env, msg);
-}
-
-int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
-    typedef int (*M)(JNIEnv*, const char*);
-    INVOKE_METHOD(jniThrowRuntimeException, M, env, msg);
 }
 
 //

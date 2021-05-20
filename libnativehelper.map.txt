@@ -11,13 +11,6 @@ LIBNATIVEHELPER_S { # introduced=S
     JNI_GetCreatedJavaVMs;
 
     # API for platform and modules only.
-    jniRegisterNativeMethods; # apex
-    jniThrowException; # apex
-    jniThrowExceptionFmt; # apex
-    jniThrowNullPointerException; # apex
-    jniThrowRuntimeException; # apex
-    jniThrowIOException; # apex
-    jniThrowErrnoException; # apex
     jniCreateFileDescriptor; # apex
     jniGetFDFromFileDescriptor; # apex
     jniSetFileDescriptorOfFD; # apex
@@ -25,9 +18,6 @@ LIBNATIVEHELPER_S { # introduced=S
     jniGetNioBufferBaseArrayOffset; # apex
     jniGetNioBufferPointer; # apex
     jniGetNioBufferFields; # apex
-    jniCreateString; # apex
-    jniLogException; # apex
-    jniUninitializeConstants; # apex
 
     JniInvocationCreate; # apex
     JniInvocationDestroy; # apex
@@ -36,4 +26,11 @@ LIBNATIVEHELPER_S { # introduced=S
 
   local:
     *;
+};
+
+LIBNATIVEHELPER_PLATFORM { # platform-only
+  global:
+    jniRegisterNativeMethods;
+    jniUninitializeConstants;
+    jniLogException;
 };
