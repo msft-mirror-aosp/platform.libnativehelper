@@ -35,19 +35,6 @@ class LibnativehelperLazyTest : public ::testing::Test {
 
 static const char* kLoadFailed = "Failed to load libnativehelper.so";
 
-TEST_F(LibnativehelperLazyTest, NoLibnativehelperIsForJNIHelp) {
-  C_JNIEnv* env = NULL;
-  EXPECT_DEATH(jniCreateString(env, NULL, 0), kLoadFailed);
-  EXPECT_DEATH(jniLogException(env, 1, "tag", NULL), kLoadFailed);
-  EXPECT_DEATH(jniRegisterNativeMethods(env, NULL, NULL, 0), kLoadFailed);
-  EXPECT_DEATH(jniThrowException(env, "", ""), kLoadFailed);
-  EXPECT_DEATH(jniThrowExceptionFmt(NULL, "test", "msg"), kLoadFailed);
-  EXPECT_DEATH(jniThrowIOException(env, 1), kLoadFailed);
-  EXPECT_DEATH(jniThrowNullPointerException(env, "msg"), kLoadFailed);
-  EXPECT_DEATH(jniThrowRuntimeException(env, "msg"), kLoadFailed);
-  EXPECT_DEATH(jniThrowErrnoException(env, "fn", 1), kLoadFailed);
-}
-
 TEST_F(LibnativehelperLazyTest, NoLibnativehelperIsForJNIPlatformHelp) {
   C_JNIEnv* env = NULL;
   EXPECT_DEATH(jniCreateFileDescriptor(env, 0), kLoadFailed);
