@@ -48,15 +48,6 @@ public class JniHelpTest extends AndroidTestCase {
     private static native int fileDescriptorGetFD(FileDescriptor jiofd);
     private static native void fileDescriptorSetFD(FileDescriptor jiofd, int unixFd);
 
-    private static native ByteBuffer allocateDirectNonHeapBuffer(int length);
-    private static native void assertBufferBaseArrayOffsetBytes(Buffer b, int offset);
-    private static native void assertBufferPosition(Buffer b, int position);
-    private static native void assertBufferLimit(Buffer b, int limit);
-    private static native void assertBufferElementSizeShift(Buffer b, int elementSizeShift);
-    private static native long getBufferBaseAddress(Buffer b);
-    private static native long getDirectBufferAddress(Buffer b);
-    private static native void assertBufferPointer(Buffer b, long address);
-
     private static native String createString(String input);
 
     public void testThrowException() {
@@ -176,114 +167,6 @@ public class JniHelpTest extends AndroidTestCase {
         FileDescriptor jiofd = fileDescriptorCreate(0);
         fileDescriptorSetFD(jiofd, UNIX_FD);
         assertEquals(UNIX_FD, fileDescriptorGetFD(jiofd));
-    }
-
-    private static void checkNioBufferApi(final Buffer b,
-                                          int baseArrayOffsetBytes,
-                                          int position,
-                                          int limit,
-                                          int elementSizeShift) {
-        assertTrue(baseArrayOffsetBytes == 0 || b.hasArray());
-        assertBufferBaseArrayOffsetBytes(b, baseArrayOffsetBytes);
-        assertBufferPosition(b, position);
-        assertBufferLimit(b, limit);
-        assertBufferElementSizeShift(b, elementSizeShift);
-
-        long baseAddress = getBufferBaseAddress(b);
-        assertEquals(baseAddress, getDirectBufferAddress(b));
-
-        if (b.isDirect() || baseAddress != 0L) {
-            Assert.assertNotEquals(0L, baseAddress);
-            long currentAddress = baseAddress + (position << elementSizeShift);
-            assertBufferPointer(b, currentAddress);
-        }
-    }
-
-    private static void checkNioHeapBuffers(final ByteBuffer bb) {
-        byte [] data = new byte[8];
-        for (int i = 0; i < 4; ++i, bb.get(data)) {
-            final int arrayOffset = bb.hasArray() ? bb.arrayOffset() : 0;
-            final int position = bb.position();
-            final int limit = bb.limit();
-            int shift = 0;
-            int baseArrayOffsetBytes = bb.hasArray() ? (arrayOffset + position) << shift : 0;
-            assertEquals(i * data.length, position);
-            checkNioBufferApi(bb, baseArrayOffsetBytes, position, limit, shift);
-            checkNioBufferApi(bb.asReadOnlyBuffer(), 0, position, limit, shift);
-
-            shift += 1;
-            checkNioBufferApi(bb.asCharBuffer(), 0, 0, (limit - position) >> shift, shift);
-            checkNioBufferApi(bb.asShortBuffer(), 0, 0, (limit - position) >> shift, shift);
-
-            shift += 1;
-            checkNioBufferApi(bb.asIntBuffer(), 0, 0, (limit - position) >> shift, shift);
-            checkNioBufferApi(bb.asFloatBuffer(), 0, 0, (limit - position) >> shift, shift);
-
-            shift += 1;
-            checkNioBufferApi(bb.asLongBuffer(), 0, 0, (limit - position) >> shift, shift);
-            checkNioBufferApi(bb.asDoubleBuffer(), 0, 0, (limit - position) >> shift, shift);
-        }
-    }
-
-    public void testNioHeapByteBuffer() {
-        ByteBuffer bb = ByteBuffer.allocate(128);
-        assertFalse(bb.isDirect());
-        assertTrue(bb.hasArray());
-        checkNioHeapBuffers(bb);
-    }
-
-    public void testNioDirectHeapByteBuffer() {
-        // Android implementation detail: allocateDirect() allocates a managed array in a
-        // non-movable managed heap.
-        ByteBuffer bb = ByteBuffer.allocateDirect(128);
-        assertTrue(bb.isDirect());
-        assertTrue(bb.hasArray());
-        checkNioHeapBuffers(bb);
-    }
-
-    public void testNioDirectNonHeapByteBuffer() {
-        ByteBuffer bb = allocateDirectNonHeapBuffer(128); // allocates native NewDirectByteBuffer()
-        assertTrue(bb.isDirect());
-        assertFalse(bb.hasArray());
-        checkNioHeapBuffers(bb);
-    }
-
-    private void checkNioXHeapBuffer(final Buffer b, final int shift, final int step) {
-        b.position(0);
-        while (b.position() < b.limit()) {
-            final int baseArrayOffsetBytes = (b.arrayOffset() + b.position()) << shift;
-            checkNioBufferApi(b, baseArrayOffsetBytes, b.position(), b.limit(), shift);
-            final int newPosition = Math.min(b.limit(), b.position() + step);
-            b.position(newPosition);
-        }
-    }
-
-    public void checkNioXHeapBuffers(final Buffer b, final int shift) {
-        for (int step = 1; step < b.limit() / 2 - 1; ++step) {
-            checkNioXHeapBuffer(b, shift, step);
-        }
-    }
-
-    public void testNioHeapShortBuffer() {
-        checkNioXHeapBuffers(ShortBuffer.allocate(64), 1);
-    }
-
-    public void testNioHeapIntBuffer() {
-        checkNioXHeapBuffers(IntBuffer.allocate(64), 2);
-   }
-
-    public void testNioHeapFloatBuffer() {
-        checkNioXHeapBuffers(FloatBuffer.allocate(64), 2);
-    }
-
-    public void testNioHeapDoubleBuffer() {
-        checkNioXHeapBuffers(DoubleBuffer.allocate(64), 3);
-    }
-
-    public void testNioWrappedHeapByteBuffer() {
-        final byte [] backing = new byte[16];
-        final ByteBuffer bb = ByteBuffer.wrap(backing, 4, 12);
-        checkNioXHeapBuffers(bb, 0);
     }
 
     public void testCreateString() {
