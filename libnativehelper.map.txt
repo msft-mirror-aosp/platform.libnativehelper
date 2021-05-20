@@ -10,23 +10,22 @@ LIBNATIVEHELPER_S { # introduced=S
     JNI_GetDefaultJavaVMInitArgs;
     JNI_GetCreatedJavaVMs;
 
-    # API for platform and modules only.
-    jniGetNioBufferBaseArray; # apex
-    jniGetNioBufferBaseArrayOffset; # apex
-    jniGetNioBufferPointer; # apex
-    jniGetNioBufferFields; # apex
-
-    JniInvocationCreate; # apex
-    JniInvocationDestroy; # apex
-    JniInvocationInit; # apex
-    JniInvocationGetLibrary; # apex
-
   local:
     *;
 };
 
 LIBNATIVEHELPER_PLATFORM { # platform-only
   global:
+    JniInvocationCreate;
+    JniInvocationDestroy;
+    JniInvocationInit;
+    JniInvocationGetLibrary;
+
+    jniGetNioBufferBaseArray;
+    jniGetNioBufferBaseArrayOffset;
+    jniGetNioBufferPointer;
+    jniGetNioBufferFields;
+
     jniRegisterNativeMethods;
     jniUninitializeConstants;
     jniLogException;
