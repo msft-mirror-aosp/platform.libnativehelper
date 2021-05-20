@@ -31,22 +31,6 @@
 __BEGIN_DECLS
 
 /*
- * Returns a new java.io.FileDescriptor for the given int fd.
- */
-jobject jniCreateFileDescriptor(C_JNIEnv* env, int fd);
-
-/*
- * Returns the int fd from a java.io.FileDescriptor.
- */
-int jniGetFDFromFileDescriptor(C_JNIEnv* env, jobject fileDescriptor);
-
-/*
- * Sets the int fd in a java.io.FileDescriptor.  Throws java.lang.NullPointerException
- * if fileDescriptor is null.
- */
-void jniSetFileDescriptorOfFD(C_JNIEnv* env, jobject fileDescriptor, int value);
-
-/*
  * Gets the managed heap array backing a java.nio.Buffer instance.
  *
  * Returns nullptr if there is no array backing.
@@ -100,18 +84,32 @@ __END_DECLS
  * For C++ code, we provide inlines that map to the C functions.  g++ always
  * inlines these, even on non-optimized builds.
  */
+
 #if defined(__cplusplus)
 
+#include <android/file_descriptor_jni.h>
+
 inline jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    return jniCreateFileDescriptor(&env->functions, fd);
+    jobject fileDescriptor = AFileDescriptor_create(env);
+    if (fileDescriptor != nullptr) {
+      AFileDescriptor_setFd(env, fileDescriptor, fd);
+    }
+    return fileDescriptor;
 }
 
 inline int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    return jniGetFDFromFileDescriptor(&env->functions, fileDescriptor);
+    if (fileDescriptor == nullptr) {
+      return -1;
+    }
+    return AFileDescriptor_getFd(env, fileDescriptor);
 }
 
 inline void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    jniSetFileDescriptorOfFD(&env->functions, fileDescriptor, value);
+    if (fileDescriptor == nullptr) {
+        jniThrowNullPointerException(env, "fileDescriptor is null");
+        return;
+    }
+    AFileDescriptor_setFd(env, fileDescriptor, value);
 }
 
 inline jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
