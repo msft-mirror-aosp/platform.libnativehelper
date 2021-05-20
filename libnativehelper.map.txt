@@ -11,9 +11,6 @@ LIBNATIVEHELPER_S { # introduced=S
     JNI_GetCreatedJavaVMs;
 
     # API for platform and modules only.
-    jniCreateFileDescriptor; # apex
-    jniGetFDFromFileDescriptor; # apex
-    jniSetFileDescriptorOfFD; # apex
     jniGetNioBufferBaseArray; # apex
     jniGetNioBufferBaseArrayOffset; # apex
     jniGetNioBufferPointer; # apex

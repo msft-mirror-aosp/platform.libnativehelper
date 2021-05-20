@@ -110,6 +110,7 @@ cc_library_shared {
         "JNIPlatformHelp.c",
         "JniConstants.c",
         "JniInvocation.c",
+        "file_descriptor_jni.c",
     ],
     export_include_dirs: [
         "header_only_include",
@@ -122,12 +123,6 @@ cc_library_shared {
     stubs: {
         symbol_file: "libnativehelper.map.txt",
         versions: ["S"],
-    },
-    target: {
-        android: {
-            // FileDescriptor NDK API is Android-only.
-            srcs: ["file_descriptor_jni.c"],
-        },
     },
     // Only distributed in the ART Module.
     apex_available: [
