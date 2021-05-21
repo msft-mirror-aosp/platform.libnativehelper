@@ -32,36 +32,6 @@ static int GetBufferElementSizeShift(JNIEnv* env, jobject nioBuffer) {
     return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer__elementSizeShift(env));
 }
 
-jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    jobject fileDescriptor = (*env)->NewObject(env,
-                                               JniConstants_FileDescriptorClass(env),
-                                               JniConstants_FileDescriptor_init(env));
-    // NOTE: NewObject ensures that an OutOfMemoryError will be seen by the Java
-    // caller if the alloc fails, so we just return nullptr when that happens.
-    if (fileDescriptor != NULL)  {
-        jniSetFileDescriptorOfFD(env, fileDescriptor, fd);
-    }
-    return fileDescriptor;
-}
-
-int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    if (fileDescriptor != NULL) {
-        return (*env)->GetIntField(env, fileDescriptor,
-                                   JniConstants_FileDescriptor_descriptor(env));
-    } else {
-        return -1;
-    }
-}
-
-void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    if (fileDescriptor == NULL) {
-        jniThrowNullPointerException(env, "null FileDescriptor");
-    } else {
-        (*env)->SetIntField(env,
-                            fileDescriptor, JniConstants_FileDescriptor_descriptor(env), value);
-    }
-}
-
 jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
     jclass nioAccessClass = JniConstants_NIOAccessClass(env);
     jmethodID getBaseArrayMethod = JniConstants_NIOAccess_getBaseArray(env);

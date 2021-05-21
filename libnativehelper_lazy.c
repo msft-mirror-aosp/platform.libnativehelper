@@ -47,25 +47,11 @@ enum MethodIndex {
     k_JNI_GetCreatedJavaVMs,
     k_JNI_GetDefaultJavaVMInitArgs,
 
-    // Methods in JNIHelp.h.
-    k_jniCreateString,
-    k_jniLogException,
-    k_jniRegisterNativeMethods,
-    k_jniThrowErrnoException,
-    k_jniThrowException,
-    k_jniThrowExceptionFmt,
-    k_jniThrowIOException,
-    k_jniThrowNullPointerException,
-    k_jniThrowRuntimeException,
-
     // Methods in JNIPlatformHelp.h.
-    k_jniCreateFileDescriptor,
-    k_jniGetFDFromFileDescriptor,
     k_jniGetNioBufferBaseArray,
     k_jniGetNioBufferBaseArrayOffset,
     k_jniGetNioBufferFields,
     k_jniGetNioBufferPointer,
-    k_jniSetFileDescriptorOfFD,
     k_jniUninitializeConstants,
 
     // Methods in JniInvocation.h.
@@ -130,25 +116,11 @@ static void InitializeOnce() {
     BIND_SYMBOL(JNI_GetCreatedJavaVMs);
     BIND_SYMBOL(JNI_GetDefaultJavaVMInitArgs);
 
-    // Methods in JNIHelp.h.
-    BIND_SYMBOL(jniCreateString);
-    BIND_SYMBOL(jniLogException);
-    BIND_SYMBOL(jniRegisterNativeMethods);
-    BIND_SYMBOL(jniThrowErrnoException);
-    BIND_SYMBOL(jniThrowException);
-    BIND_SYMBOL(jniThrowExceptionFmt);
-    BIND_SYMBOL(jniThrowIOException);
-    BIND_SYMBOL(jniThrowNullPointerException);
-    BIND_SYMBOL(jniThrowRuntimeException);
-
     // Methods in JNIPlatformHelp.h.
-    BIND_SYMBOL(jniCreateFileDescriptor);
-    BIND_SYMBOL(jniGetFDFromFileDescriptor);
     BIND_SYMBOL(jniGetNioBufferBaseArray);
     BIND_SYMBOL(jniGetNioBufferBaseArrayOffset);
     BIND_SYMBOL(jniGetNioBufferFields);
     BIND_SYMBOL(jniGetNioBufferPointer);
-    BIND_SYMBOL(jniSetFileDescriptorOfFD);
     BIND_SYMBOL(jniUninitializeConstants);
 
     // Methods in JniInvocation.h.
@@ -248,70 +220,8 @@ jint JNI_GetCreatedJavaVMs(JavaVM** p_vm, jsize vm_max, jsize* p_vm_count) {
 }
 
 //
-// Forwarding for methods in JNIHelp.h.
-//
-
-jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
-    typedef jstring (*M)(JNIEnv*, const jchar*, jsize);
-    INVOKE_METHOD(jniCreateString, M, env, unicodeChars, len);
-}
-
-void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowable exception) {
-    typedef void (*M)(JNIEnv*, int, const char*, jthrowable);
-    INVOKE_VOID_METHOD(jniLogException, M, env, priority, tag, exception);
-}
-
-int jniRegisterNativeMethods(JNIEnv* env,
-                             const char* className,
-                             const JNINativeMethod* gMethods,
-                             int numMethods) {
-    typedef int (*M)(JNIEnv*, const char*, const JNINativeMethod*, int numMethods);
-    INVOKE_METHOD(jniRegisterNativeMethods, M, env, className, gMethods, numMethods);
-}
-
-int jniThrowErrnoException(JNIEnv* env, const char* functionName, int errnum) {
-    typedef int (*M)(JNIEnv*, const char*, int);
-    INVOKE_METHOD(jniThrowErrnoException, M, env, functionName, errnum);
-}
-
-int jniThrowException(JNIEnv* env, const char* className, const char* msg) {
-    typedef int (*M)(JNIEnv*, const char*, const char*);
-    INVOKE_METHOD(jniThrowException, M, env, className, msg);
-}
-
-int jniThrowExceptionFmt(JNIEnv* env, const char* className, const char* fmt, va_list args) {
-    typedef int (*M)(JNIEnv*, const char*, const char*, va_list);
-    INVOKE_METHOD(jniThrowExceptionFmt, M, env, className, fmt, args);
-}
-
-int jniThrowIOException(JNIEnv* env, int errnum) {
-    typedef int (*M)(JNIEnv*, int);
-    INVOKE_METHOD(jniThrowIOException, M, env, errnum);
-}
-
-int jniThrowNullPointerException(JNIEnv* env, const char* msg) {
-    typedef int (*M)(JNIEnv*, const char*);
-    INVOKE_METHOD(jniThrowNullPointerException, M, env, msg);
-}
-
-int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
-    typedef int (*M)(JNIEnv*, const char*);
-    INVOKE_METHOD(jniThrowRuntimeException, M, env, msg);
-}
-
-//
 // Forwarding for methods in JNIPlatformHelp.h.
 //
-
-jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    typedef jobject (*M)(JNIEnv*, int);
-    INVOKE_METHOD(jniCreateFileDescriptor, M, env, fd);
-}
-
-int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    typedef int (*M)(JNIEnv*, jobject);
-    INVOKE_METHOD(jniGetFDFromFileDescriptor, M, env, fileDescriptor);
-}
 
 jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
     typedef jarray (*M)(JNIEnv*, jobject);
@@ -333,11 +243,6 @@ jlong jniGetNioBufferFields(JNIEnv* env, jobject nioBuffer,
 jlong jniGetNioBufferPointer(JNIEnv* env, jobject nioBuffer) {
     typedef jlong (*M)(JNIEnv*, jobject);
     INVOKE_METHOD(jniGetNioBufferPointer, M, env, nioBuffer);
-}
-
-void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    typedef void (*M)(JNIEnv*, jobject, int);
-    INVOKE_VOID_METHOD(jniSetFileDescriptorOfFD, M, env, fileDescriptor, value);
 }
 
 void jniUninitializeConstants() {
