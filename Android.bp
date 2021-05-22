@@ -162,7 +162,7 @@ cc_library_static {
 // - This doesn't include JniInvocation.
 //
 
-cc_library_shared {
+cc_library {
     name: "libnativehelper_compat_libc++",
     defaults: ["libnativehelper_defaults"],
     header_libs: ["jni_headers"],
@@ -172,6 +172,7 @@ cc_library_shared {
         "header_only_include",
         "include",
     ],
+    host_supported: true,
     local_include_dirs: [
         "header_only_include",
         "include_platform_header_only",
@@ -180,10 +181,13 @@ cc_library_shared {
         "ExpandableString.c",
         "JNIHelp.c",
     ],
+    min_sdk_version: "29",
     sdk_version: "19",
     stl: "none",
     apex_available: [
         "//apex_available:platform",
+        "com.android.art",
+        "com.android.art.debug",
         "com.android.extservices",
         "com.android.tethering",
     ],
@@ -193,6 +197,7 @@ cc_library_shared {
         "//external/perfetto:__subpackages__",
         "//frameworks/base/packages/Connectivity/tests/integration:__pkg__",
         "//frameworks/base/packages/Tethering:__subpackages__",
+        "//libcore:__subpackages__",
         "//packages/modules/Connectivity/tests:__subpackages__",
         "//packages/modules/Connectivity/Tethering:__subpackages__",
         "//packages/modules/ExtServices:__subpackages__",
