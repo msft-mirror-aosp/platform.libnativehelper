@@ -141,8 +141,7 @@
  * the stricter approach is taken: the most exact C++ type must be used.
  */
 
-#ifndef LIBNATIVEHELPER_PLATFORM_INCLUDE_NATIVEHELPER_JNI_MACROS_H_
-#define LIBNATIVEHELPER_PLATFORM_INCLUDE_NATIVEHELPER_JNI_MACROS_H_
+#pragma once
 
 // The below basic macros do not perform automatic stringification,
 // invoked e.g. as MAKE_JNI_NATIVE_METHOD("some_name", "()V", void_fn)
@@ -282,4 +281,3 @@
     (to)
 #endif
 
-#endif  // LIBNATIVEHELPER_PLATFORM_INCLUDE_NATIVEHELPER_JNI_MACROS_H_
