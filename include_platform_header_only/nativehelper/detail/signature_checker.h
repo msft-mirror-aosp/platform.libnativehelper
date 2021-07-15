@@ -32,8 +32,7 @@
  * Everything in this file except ostream<< is constexpr.
  */
 
-#ifndef LIBNATIVEHELPER_PLATFORM_INCLUDE_NATIVEHELPER_DETAIL_SIGNATURE_CHECKER_H_
-#define LIBNATIVEHELPER_PLATFORM_INCLUDE_NATIVEHELPER_DETAIL_SIGNATURE_CHECKER_H_
+#pragma once
 
 #include <iostream>     // std::ostream
 #include <jni.h>        // jni typedefs, JniNativeMethod.
@@ -1440,4 +1439,3 @@ struct InferJniDescriptor {
 }  // namespace detail
 }  // namespace nativehelper
 
-#endif  // LIBNATIVEHELPER_PLATFORM_INCLUDE_NATIVEHELPER_DETAIL_SIGNATURE_CHECKER_H_
