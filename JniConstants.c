@@ -26,29 +26,55 @@
 
 // jclass constants list:
 //   <class, signature, androidOnly>
-
+#ifdef __ANDROID__
 #define JCLASS_CONSTANTS_LIST(V)                                            \
   V(FileDescriptor, "java/io/FileDescriptor", false)                        \
   V(NIOAccess, "java/nio/NIOAccess", true)                                  \
   V(NioBuffer, "java/nio/Buffer", false)
+#else
+#define JCLASS_CONSTANTS_LIST(V)                                                         \
+  V(FileDescriptor, "java/io/FileDescriptor", false)                                     \
+  V(NIOAccess, "com/android/tools/layoutlib/java/nio/NIOAccess_Delegate", true)          \
+  V(NioBufferDelegate, "com/android/tools/layoutlib/java/nio/Buffer_Delegate", false)    \
+  V(NioBuffer, "java/nio/Buffer", false)
+#endif
 
 // jmethodID's of public methods constants list:
 //   <Class, method, method-string, signature, is_static>
+#ifdef __ANDROID__
 #define JMETHODID_CONSTANTS_LIST(V)                                                         \
   V(FileDescriptor, init, "<init>", "()V", false)                                           \
   V(NIOAccess, getBaseArray, "getBaseArray", "(Ljava/nio/Buffer;)Ljava/lang/Object;", true) \
   V(NIOAccess, getBaseArrayOffset, "getBaseArrayOffset", "(Ljava/nio/Buffer;)I", true)      \
   V(NioBuffer, array, "array", "()Ljava/lang/Object;", false)                               \
   V(NioBuffer, arrayOffset, "arrayOffset", "()I", false)
+#else
+#define JMETHODID_CONSTANTS_LIST(V)                                                         \
+  V(FileDescriptor, init, "<init>", "()V", false)                                           \
+  V(NIOAccess, getBaseArray, "getBaseArray", "(Ljava/nio/Buffer;)Ljava/lang/Object;", true) \
+  V(NIOAccess, getBaseArrayOffset, "getBaseArrayOffset", "(Ljava/nio/Buffer;)I", true)      \
+  V(NioBuffer, array, "array", "()Ljava/lang/Object;", false)                               \
+  V(NioBuffer, isDirect, "isDirect", "()Z", false)                                          \
+  V(NioBufferDelegate, elementSizeShift, "elementSizeShift", "(Ljava/nio/Buffer;)I", true)  \
+  V(NioBuffer, arrayOffset, "arrayOffset", "()I", false)
+#endif
 
 // jfieldID constants list:
 //   <Class, field, signature, is_static>
+#ifdef __ANDROID__
 #define JFIELDID_CONSTANTS_LIST(V)                                          \
   V(FileDescriptor, descriptor, "I", false)                                 \
   V(NioBuffer, _elementSizeShift, "I", false)                               \
   V(NioBuffer, address, "J", false)                                         \
   V(NioBuffer, limit, "I", false)                                           \
   V(NioBuffer, position, "I", false)
+#else
+#define JFIELDID_CONSTANTS_LIST(V)                                          \
+  V(FileDescriptor, fd, "I", false)                                         \
+  V(NioBuffer, address, "J", false)                                         \
+  V(NioBuffer, limit, "I", false)                                           \
+  V(NioBuffer, position, "I", false)
+#endif
 
 #define CLASS_NAME(cls)             g_ ## cls
 #define METHOD_NAME(cls, method)    g_ ## cls ## _ ## method

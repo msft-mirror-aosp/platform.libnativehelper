@@ -29,7 +29,13 @@ static int GetBufferLimit(JNIEnv* env, jobject nioBuffer) {
 }
 
 static int GetBufferElementSizeShift(JNIEnv* env, jobject nioBuffer) {
+#ifdef __ANDROID__
     return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer__elementSizeShift(env));
+#else
+    jclass bufferDelegateClass = JniConstants_NioBufferDelegateClass(env);
+    jmethodID elementSizeShiftMethod = JniConstants_NioBufferDelegate_elementSizeShift(env);
+    return (*env)->CallStaticIntMethod(env, bufferDelegateClass, elementSizeShiftMethod, nioBuffer);
+#endif
 }
 
 jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
@@ -47,6 +53,15 @@ int jniGetNioBufferBaseArrayOffset(JNIEnv* env, jobject nioBuffer) {
 }
 
 jlong jniGetNioBufferPointer(JNIEnv* env, jobject nioBuffer) {
+#ifndef __ANDROID__
+    // in Java 11, the address field of a HeapByteBuffer contains a non-zero value despite
+    // HeapByteBuffer being a non-direct buffer. In that case, this should still return 0.
+    jmethodID isDirectMethod = JniConstants_NioBuffer_isDirect(env);
+    jboolean isDirect = (*env)->CallBooleanMethod(env, nioBuffer, isDirectMethod);
+    if (isDirect == JNI_FALSE) {
+        return 0L;
+    }
+#endif
     jlong baseAddress = (*env)->GetLongField(env, nioBuffer, JniConstants_NioBuffer_address(env));
     if (baseAddress != 0) {
         const int position = GetBufferPosition(env, nioBuffer);
