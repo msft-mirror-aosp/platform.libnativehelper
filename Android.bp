@@ -197,6 +197,7 @@ cc_library {
         "//external/perfetto:__subpackages__",
         "//frameworks/base/packages/Connectivity/tests/integration:__pkg__",
         "//frameworks/base/packages/Tethering:__subpackages__",
+        "//frameworks/libs/net/common/native/bpfmapjni",
         "//libcore:__subpackages__",
         "//packages/modules/Connectivity/tests:__subpackages__",
         "//packages/modules/Connectivity/Tethering:__subpackages__",
