@@ -23,14 +23,25 @@
 #include <sys/system_properties.h>
 #endif
 
+#include <errno.h>
 #include <jni.h>
 #include <stdbool.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "DlHelp.h"
 
 // Name the default library providing the JNI Invocation API.
 static const char* kDefaultJniInvocationLibrary = "libart.so";
+static const char* kDebugJniInvocationLibrary = "libartd.so";
+#if defined(__LP64__)
+#define LIB_DIR "lib64"
+#else
+#define LIB_DIR "lib"
+#endif
+static const char* kDebugJniInvocationLibraryPath = "/apex/com.android.art/" LIB_DIR "/libartd.so";
 
 struct JniInvocationImpl {
   // Name of library providing JNI_ method implementations.
@@ -118,9 +129,18 @@ const char* JniInvocationGetLibraryWith(const char* library,
     if (library != NULL) {
       return library;
     }
+
     // Choose the system_preferred_library (if provided).
-    if (system_preferred_library != NULL) {
+    if (system_preferred_library != NULL && system_preferred_library[0] != '\0') {
       return system_preferred_library;
+    }
+
+    // Try to use the debug library.
+    struct stat st;
+    if (stat(kDebugJniInvocationLibraryPath, &st) == 0) {
+      return kDebugJniInvocationLibrary;
+    } else if (errno != ENOENT) {
+      ALOGW("Failed to stat %s: %s", kDebugJniInvocationLibraryPath, strerror(errno));
     }
   }
   return kDefaultJniInvocationLibrary;
