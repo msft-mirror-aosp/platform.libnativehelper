@@ -130,18 +130,20 @@ const char* JniInvocationGetLibraryWith(const char* library,
       return library;
     }
 
-    // Choose the system_preferred_library (if provided).
-    if (system_preferred_library != NULL && system_preferred_library[0] != '\0') {
-      return system_preferred_library;
-    }
-
-    // Try to use the debug library.
+    // If the debug library is installed, use it.
+    // TODO(b/216099383): Do this in the test harness instead.
     struct stat st;
     if (stat(kDebugJniInvocationLibraryPath, &st) == 0) {
       return kDebugJniInvocationLibrary;
     } else if (errno != ENOENT) {
       ALOGW("Failed to stat %s: %s", kDebugJniInvocationLibraryPath, strerror(errno));
     }
+
+    // Choose the system_preferred_library (if provided).
+    if (system_preferred_library != NULL) {
+      return system_preferred_library;
+    }
+
   }
   return kDefaultJniInvocationLibrary;
 }
