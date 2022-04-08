@@ -1,30 +1,40 @@
-LIBNATIVEHELPER_S { # introduced=S
+# This library should only export C linkage definitions.
+#
+# VERSION string that follows is derived from <library_name>_<version>.
+LIBNATIVEHELPER_1 {
   global:
-    # NDK API for libnativehelper.
-    AFileDescriptor_create;
-    AFileDescriptor_getFd;
-    AFileDescriptor_setFd;
-
-    # JNI Invocation methods available to platform and apps.
-    JNI_CreateJavaVM;
     JNI_GetDefaultJavaVMInitArgs;
+    JNI_CreateJavaVM;
     JNI_GetCreatedJavaVMs;
 
-  local:
-    *;
-};
+    jniRegisterNativeMethods;
+    jniThrowException;
+    jniThrowExceptionFmt;
+    jniThrowNullPointerException;
+    jniThrowRuntimeException;
+    jniThrowIOException;
+    jniStrError;
+    jniCreateFileDescriptor;
+    jniGetFDFromFileDescriptor;
+    jniSetFileDescriptorOfFD;
+    jniGetOwnerIdFromFileDescriptor;
+    jniGetNioBufferBaseArray;
+    jniGetNioBufferBaseArrayOffset;
+    jniGetNioBufferPointer;
+    jniGetNioBufferFields;
+    jniGetReferent;
+    jniCreateString;
+    jniLogException;
+    jniUninitializeConstants;
 
-LIBNATIVEHELPER_PLATFORM { # platform-only
-  global:
     JniInvocationCreate;
     JniInvocationDestroy;
     JniInvocationInit;
     JniInvocationGetLibrary;
 
-    jniGetNioBufferBaseArray;
-    jniGetNioBufferBaseArrayOffset;
-    jniGetNioBufferPointer;
-    jniGetNioBufferFields;
+    newStringArray;
+    toStringArray;
 
-    jniUninitializeConstants;
+  local:
+    *;
 };

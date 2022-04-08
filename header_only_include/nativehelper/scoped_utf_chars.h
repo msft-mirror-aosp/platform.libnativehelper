@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_
+#define LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_
 
-#include <stddef.h>
 #include <string.h>
 
-#include <jni.h>
-
+#include "jni.h"
 #include "nativehelper_utils.h"
 
 // A smart pointer that provides read-only access to a Java string's UTF chars.
@@ -92,3 +91,4 @@ class ScopedUtfChars {
   DISALLOW_COPY_AND_ASSIGN(ScopedUtfChars);
 };
 
+#endif  // LIBNATIVEHELPER_HEADER_ONLY_INCLUDE_NATIVEHELPER_SCOPED_UTF_CHARS_H_

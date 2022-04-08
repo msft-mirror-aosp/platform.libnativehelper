@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_SCOPEDLOCALFRAME_H_
+#define LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_SCOPEDLOCALFRAME_H_
 
 #include <nativehelper/scoped_local_frame.h>
 
+#endif  // LIBNATIVEHELPER_INCLUDE_NATIVEHELPER_SCOPEDLOCALFRAME_H_
