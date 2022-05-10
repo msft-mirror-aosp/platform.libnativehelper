@@ -34,8 +34,7 @@
 #else
 #define JCLASS_CONSTANTS_LIST(V)                                                         \
   V(FileDescriptor, "java/io/FileDescriptor", false)                                     \
-  V(NIOAccess, "com/android/tools/layoutlib/java/nio/NIOAccess_Delegate", true)          \
-  V(NioBufferDelegate, "com/android/tools/layoutlib/java/nio/Buffer_Delegate", false)    \
+  V(NIOAccess, "org/robolectric/nativeruntime/NIOAccess", true)          \
   V(NioBuffer, "java/nio/Buffer", false)
 #endif
 
@@ -55,7 +54,7 @@
   V(NIOAccess, getBaseArrayOffset, "getBaseArrayOffset", "(Ljava/nio/Buffer;)I", true)      \
   V(NioBuffer, array, "array", "()Ljava/lang/Object;", false)                               \
   V(NioBuffer, isDirect, "isDirect", "()Z", false)                                          \
-  V(NioBufferDelegate, elementSizeShift, "elementSizeShift", "(Ljava/nio/Buffer;)I", true)  \
+  V(NIOAccess, elementSizeShift, "elementSizeShift", "(Ljava/nio/Buffer;)I", true)  \
   V(NioBuffer, arrayOffset, "arrayOffset", "()I", false)
 #endif
 

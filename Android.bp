@@ -98,7 +98,7 @@ cc_library_headers {
     min_sdk_version: "S",
 }
 
-cc_library_shared {
+cc_library {
     name: "libnativehelper",
     defaults: ["libnativehelper_defaults"],
     bootstrap: false,
