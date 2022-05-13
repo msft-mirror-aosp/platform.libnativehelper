@@ -32,9 +32,9 @@ static int GetBufferElementSizeShift(JNIEnv* env, jobject nioBuffer) {
 #ifdef __ANDROID__
     return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer__elementSizeShift(env));
 #else
-    jclass bufferDelegateClass = JniConstants_NioBufferDelegateClass(env);
-    jmethodID elementSizeShiftMethod = JniConstants_NioBufferDelegate_elementSizeShift(env);
-    return (*env)->CallStaticIntMethod(env, bufferDelegateClass, elementSizeShiftMethod, nioBuffer);
+    jclass nioAccessClass = JniConstants_NIOAccessClass(env);
+    jmethodID elementSizeShiftMethod = JniConstants_NIOAccess_elementSizeShift(env);
+    return (*env)->CallStaticIntMethod(env, nioAccessClass, elementSizeShiftMethod, nioBuffer);
 #endif
 }
 
