@@ -206,6 +206,7 @@ cc_library {
         "//packages/modules/Connectivity:__subpackages__",
         "//packages/modules/ExtServices:__subpackages__",
         "//packages/modules/NetworkStack:__subpackages__",
+        "//packages/modules/Permission/tests/cts:__subpackages__",
         ":__subpackages__",
     ],
 }
