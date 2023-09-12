@@ -32,6 +32,8 @@
 //   if (name.c_str() == nullptr) {
 //     return nullptr;
 //   }
+//
+// Also consider using `GET_UTF_OR_RETURN`, a shorthand for the 4 lines above.
 class ScopedUtfChars {
  public:
   ScopedUtfChars(JNIEnv* env, jstring s) : env_(env), string_(s) {
