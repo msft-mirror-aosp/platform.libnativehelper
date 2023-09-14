@@ -89,6 +89,14 @@ class JniDefaultValue {
 //   ScopedUtfChars str = GET_UTF_OR_RETURN_VOID(env, j_str);
 //   // Safely use `str` here...
 // }
+//
+// The idiomatic way to construct an `std::string` using this macro (an additional string copy is
+// performed):
+//
+// jobject MyJniMethod(JNIEnv* env, jstring j_str) {
+//   std::string str(GET_UTF_OR_RETURN(env, j_str));
+//   // Safely use `str` here...
+// }
 #define GET_UTF_OR_RETURN(env, expr) \
     GET_UTF_OR_RETURN_IMPL_((env), (expr), android::jnihelp::JniDefaultValue())
 #define GET_UTF_OR_RETURN_VOID(env, expr) GET_UTF_OR_RETURN_IMPL_((env), (expr))
