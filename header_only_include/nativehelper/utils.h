@@ -35,8 +35,8 @@ namespace jnihelp {
 // Implementation details. DO NOT use directly.
 namespace internal {
 
-[[maybe_unused]] static const char* get_c_str(const char* str) { return str; }
-[[maybe_unused]] static const char* get_c_str(const std::string& str) { return str.c_str(); }
+[[maybe_unused]] static const char* GetCStr(const char* str) { return str; }
+[[maybe_unused]] static const char* GetCStr(const std::string& str) { return str.c_str(); }
 
 }  // namespace internal
 
@@ -103,12 +103,12 @@ class JniDefaultValue {
 
 #define GET_UTF_OR_RETURN_IMPL_(env, expr, ...)                          \
     ({                                                                   \
-        ScopedUtfChars tmp_scoped_utf_chars_(env, expr);                 \
-        if (tmp_scoped_utf_chars_.c_str() == nullptr) {                  \
+        ScopedUtfChars __or_return_scoped_utf_chars(env, expr);          \
+        if (__or_return_scoped_utf_chars.c_str() == nullptr) {           \
             /* Return with a pending exception from `ScopedUtfChars`. */ \
             return __VA_ARGS__;                                          \
         }                                                                \
-        std::move(tmp_scoped_utf_chars_);                                \
+        std::move(__or_return_scoped_utf_chars);                         \
     })
 
 // Creates `ScopedLocalRef<jstring>` from a `const char*` or `std::string` expression using
@@ -139,15 +139,19 @@ class JniDefaultValue {
 
 #define CREATE_UTF_OR_RETURN_IMPL_(env, expr, ...)                                             \
     ({                                                                                         \
-        const char* tmp_c_str_ = android::jnihelp::internal::get_c_str(expr);                  \
-        ScopedLocalRef<jstring> tmp_local_ref_(env, env->NewStringUTF(tmp_c_str_));            \
+        const char* __or_return_c_str;                                                         \
+        ScopedLocalRef<jstring> __or_return_local_ref(                                         \
+            env,                                                                               \
+            env->NewStringUTF(__or_return_c_str = android::jnihelp::internal::GetCStr(expr))); \
+        /* `*__or_return_c_str` may be freed here, but we only compare the pointer against     \
+         * nullptr. DO NOT DEREFERENCE `*__or_return_c_str` after this point. */               \
         /* `NewStringUTF` returns nullptr when OOM or the input is nullptr, but only throws an \
          * exception when OOM. */                                                              \
-        if (tmp_local_ref_ == nullptr && tmp_c_str_ != nullptr) {                              \
+        if (__or_return_local_ref == nullptr && __or_return_c_str != nullptr) {                \
             /* Return with a pending exception from `NewStringUTF`. */                         \
             return __VA_ARGS__;                                                                \
         }                                                                                      \
-        std::move(tmp_local_ref_);                                                             \
+        std::move(__or_return_local_ref);                                                      \
     })
 
 }  // namespace jnihelp
