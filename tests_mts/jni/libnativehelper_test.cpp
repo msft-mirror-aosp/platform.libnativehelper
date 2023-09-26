@@ -103,6 +103,46 @@ TEST_F(LibnativehelperTest, CreateUtfOrReturn) {
     EXPECT_EQ(ret, 1);
 }
 
+class MyString : public std::string {
+   public:
+    explicit MyString(const char* c_str) : std::string(c_str) {}
+
+    // Force clear the string to catch use-after-free issues.
+    ~MyString() { clear(); }
+};
+
+// `expr` creates a temporary object and evaluates to it.
+TEST_F(LibnativehelperTest, CreateUtfOrReturnExprEvaluatesToTemporary) {
+    std::unique_ptr<ScopedLocalRef<jstring>> result;
+
+    jint ret = [&](JNIEnv* env) -> jint {
+        ScopedLocalRef<jstring> j_str = CREATE_UTF_OR_RETURN(env, MyString("foo"));
+        result.reset(new ScopedLocalRef<jstring>(std::move(j_str)));
+        return 1;
+    }(mEnv);
+
+    ScopedUtfChars str(mEnv, result->get());
+    EXPECT_EQ(str.c_str(), std::string_view("foo"));
+    EXPECT_FALSE(mEnv->ExceptionCheck());
+    EXPECT_EQ(ret, 1);
+}
+
+// `expr` creates a temporary object and evaluates to something else backed by it.
+TEST_F(LibnativehelperTest, CreateUtfOrReturnExprEvaluatesToValueBackedByTemporary) {
+    std::unique_ptr<ScopedLocalRef<jstring>> result;
+
+    jint ret = [&](JNIEnv* env) -> jint {
+        ScopedLocalRef<jstring> j_str = CREATE_UTF_OR_RETURN(env, MyString("foo").c_str());
+        result.reset(new ScopedLocalRef<jstring>(std::move(j_str)));
+        return 1;
+    }(mEnv);
+
+    ScopedUtfChars str(mEnv, result->get());
+    EXPECT_EQ(str.c_str(), std::string_view("foo"));
+    EXPECT_FALSE(mEnv->ExceptionCheck());
+    EXPECT_EQ(ret, 1);
+}
+
 TEST_F(LibnativehelperTest, CreateUtfOrReturnVoid) {
     std::unique_ptr<ScopedLocalRef<jstring>> result;
 
