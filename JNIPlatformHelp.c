@@ -32,24 +32,68 @@ static int GetBufferElementSizeShift(JNIEnv* env, jobject nioBuffer) {
 #ifdef __ANDROID__
     return(*env)->GetIntField(env, nioBuffer, JniConstants_NioBuffer__elementSizeShift(env));
 #else
-    jclass nioAccessClass = JniConstants_NIOAccessClass(env);
-    jmethodID elementSizeShiftMethod = JniConstants_NIOAccess_elementSizeShift(env);
-    return (*env)->CallStaticIntMethod(env, nioAccessClass, elementSizeShiftMethod, nioBuffer);
+    jclass byteBufferClass = JniConstants_NioByteBufferClass(env);
+    jclass shortBufferClass = JniConstants_NioShortBufferClass(env);
+    jclass charBufferClass = JniConstants_NioCharBufferClass(env);
+    jclass intBufferClass = JniConstants_NioIntBufferClass(env);
+    jclass floatBufferClass = JniConstants_NioFloatBufferClass(env);
+    jclass longBufferClass = JniConstants_NioLongBufferClass(env);
+    jclass doubleBufferClass = JniConstants_NioDoubleBufferClass(env);
+
+    // Check the type of the Buffer
+    if ((*env)->IsInstanceOf(env, nioBuffer, byteBufferClass)) {
+        return 0;
+    } else if ((*env)->IsInstanceOf(env, nioBuffer, shortBufferClass) ||
+               (*env)->IsInstanceOf(env, nioBuffer, charBufferClass)) {
+        return 1;
+    } else if ((*env)->IsInstanceOf(env, nioBuffer, intBufferClass) ||
+               (*env)->IsInstanceOf(env, nioBuffer, floatBufferClass)) {
+        return 2;
+    } else if ((*env)->IsInstanceOf(env, nioBuffer, longBufferClass) ||
+               (*env)->IsInstanceOf(env, nioBuffer, doubleBufferClass)) {
+        return 3;
+    }
+    return 0;
 #endif
 }
 
 jarray jniGetNioBufferBaseArray(JNIEnv* env, jobject nioBuffer) {
+#ifdef __ANDROID__
     jclass nioAccessClass = JniConstants_NIOAccessClass(env);
     jmethodID getBaseArrayMethod = JniConstants_NIOAccess_getBaseArray(env);
     jobject object = (*env)->CallStaticObjectMethod(env,
                                                     nioAccessClass, getBaseArrayMethod, nioBuffer);
     return (jarray) object;
+#else
+    jmethodID hasArrayMethod = JniConstants_NioBuffer_hasArray(env);
+    jboolean hasArray = (*env)->CallBooleanMethod(env, nioBuffer, hasArrayMethod);
+    if (hasArray) {
+        jmethodID arrayMethod = JniConstants_NioBuffer_array(env);
+        return (*env)->CallObjectMethod(env, nioBuffer, arrayMethod);
+    } else {
+        return NULL;
+    }
+#endif
 }
 
 int jniGetNioBufferBaseArrayOffset(JNIEnv* env, jobject nioBuffer) {
+#ifdef __ANDROID__
     jclass nioAccessClass = JniConstants_NIOAccessClass(env);
     jmethodID getBaseArrayOffsetMethod = JniConstants_NIOAccess_getBaseArrayOffset(env);
     return (*env)->CallStaticIntMethod(env, nioAccessClass, getBaseArrayOffsetMethod, nioBuffer);
+#else
+    jmethodID hasArrayMethod = JniConstants_NioBuffer_hasArray(env);
+    jmethodID arrayOffsetMethod = JniConstants_NioBuffer_arrayOffset(env);
+    jboolean hasArray = (*env)->CallBooleanMethod(env, nioBuffer, hasArrayMethod);
+    if (hasArray) {
+        jint arrayOffset = (*env)->CallIntMethod(env, nioBuffer, arrayOffsetMethod);
+        const int position = GetBufferPosition(env, nioBuffer);
+        jint elementSizeShift = GetBufferElementSizeShift(env, nioBuffer);
+        return (arrayOffset + position) << elementSizeShift;
+    } else {
+        return 0;
+    }
+#endif
 }
 
 jlong jniGetNioBufferPointer(JNIEnv* env, jobject nioBuffer) {

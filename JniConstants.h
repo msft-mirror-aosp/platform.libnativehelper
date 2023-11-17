@@ -29,8 +29,17 @@ __BEGIN_DECLS
 // JniConstants.c.
 //
 jclass JniConstants_FileDescriptorClass(JNIEnv* env);
+#ifdef __ANDROID__
 jclass JniConstants_NIOAccessClass(JNIEnv* env);
+#endif
 jclass JniConstants_NioBufferClass(JNIEnv* env);
+jclass JniConstants_NioByteBufferClass(JNIEnv* env);
+jclass JniConstants_NioShortBufferClass(JNIEnv* env);
+jclass JniConstants_NioCharBufferClass(JNIEnv* env);
+jclass JniConstants_NioIntBufferClass(JNIEnv* env);
+jclass JniConstants_NioFloatBufferClass(JNIEnv* env);
+jclass JniConstants_NioLongBufferClass(JNIEnv* env);
+jclass JniConstants_NioDoubleBufferClass(JNIEnv* env);
 
 //
 // Methods in the constants cache.
@@ -39,13 +48,15 @@ jclass JniConstants_NioBufferClass(JNIEnv* env);
 // JniConstants.c.
 //
 jmethodID JniConstants_FileDescriptor_init(JNIEnv* env);
+#ifdef __ANDROID__
 jmethodID JniConstants_NIOAccess_getBaseArray(JNIEnv* env);
 jmethodID JniConstants_NIOAccess_getBaseArrayOffset(JNIEnv* env);
+#endif
 jmethodID JniConstants_NioBuffer_array(JNIEnv* env);
 jmethodID JniConstants_NioBuffer_arrayOffset(JNIEnv* env);
+jmethodID JniConstants_NioBuffer_hasArray(JNIEnv* env);
 #ifndef __ANDROID__
 jmethodID JniConstants_NioBuffer_isDirect(JNIEnv* env);
-jmethodID JniConstants_NIOAccess_elementSizeShift(JNIEnv* env);
 #endif
 
 //

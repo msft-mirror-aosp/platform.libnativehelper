@@ -32,10 +32,16 @@
   V(NIOAccess, "java/nio/NIOAccess", true)                                  \
   V(NioBuffer, "java/nio/Buffer", false)
 #else
-#define JCLASS_CONSTANTS_LIST(V)                                                         \
-  V(FileDescriptor, "java/io/FileDescriptor", false)                                     \
-  V(NIOAccess, "org/robolectric/nativeruntime/NIOAccess", true)          \
-  V(NioBuffer, "java/nio/Buffer", false)
+#define JCLASS_CONSTANTS_LIST(V)                                            \
+  V(FileDescriptor, "java/io/FileDescriptor", false)                        \
+  V(NioBuffer, "java/nio/Buffer", false)                                    \
+  V(NioByteBuffer, "java/nio/ByteBuffer", false)                            \
+  V(NioShortBuffer, "java/nio/ShortBuffer", false)                          \
+  V(NioCharBuffer, "java/nio/CharBuffer", false)                            \
+  V(NioIntBuffer, "java/nio/IntBuffer", false)                              \
+  V(NioFloatBuffer, "java/nio/FloatBuffer", false)                          \
+  V(NioLongBuffer, "java/nio/LongBuffer", false)                            \
+  V(NioDoubleBuffer, "java/nio/DoubleBuffer", false)
 #endif
 
 // jmethodID's of public methods constants list:
@@ -50,11 +56,9 @@
 #else
 #define JMETHODID_CONSTANTS_LIST(V)                                                         \
   V(FileDescriptor, init, "<init>", "()V", false)                                           \
-  V(NIOAccess, getBaseArray, "getBaseArray", "(Ljava/nio/Buffer;)Ljava/lang/Object;", true) \
-  V(NIOAccess, getBaseArrayOffset, "getBaseArrayOffset", "(Ljava/nio/Buffer;)I", true)      \
+  V(NioBuffer, hasArray, "hasArray", "()Z", false)                                          \
   V(NioBuffer, array, "array", "()Ljava/lang/Object;", false)                               \
   V(NioBuffer, isDirect, "isDirect", "()Z", false)                                          \
-  V(NIOAccess, elementSizeShift, "elementSizeShift", "(Ljava/nio/Buffer;)I", true)  \
   V(NioBuffer, arrayOffset, "arrayOffset", "()I", false)
 #endif
 
