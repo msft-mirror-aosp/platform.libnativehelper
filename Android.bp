@@ -103,6 +103,11 @@ cc_library {
     defaults: ["libnativehelper_defaults"],
     bootstrap: false,
     host_supported: true,
+    target: {
+        windows: {
+            enabled: true,
+      },
+    },
     srcs: [
         "DlHelp.c",
         "ExpandableString.c",
