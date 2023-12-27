@@ -36,6 +36,11 @@ cc_defaults {
         "-std=c11",
     ],
     shared_libs: ["liblog"],
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
 }
 
 cc_library_headers {
@@ -103,11 +108,6 @@ cc_library {
     defaults: ["libnativehelper_defaults"],
     bootstrap: false,
     host_supported: true,
-    target: {
-        windows: {
-            enabled: true,
-      },
-    },
     srcs: [
         "DlHelp.c",
         "ExpandableString.c",
