@@ -36,6 +36,7 @@ cc_defaults {
         "-std=c11",
     ],
     shared_libs: ["liblog"],
+    export_shared_lib_headers: ["liblog"],
 }
 
 cc_library_headers {
