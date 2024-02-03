@@ -98,7 +98,7 @@ cc_library_headers {
         "com.android.art",
         "com.android.art.debug",
     ],
-    min_sdk_version: "S",
+    min_sdk_version: "S",       // 31
 }
 
 cc_library_shared {
@@ -132,7 +132,7 @@ cc_library_shared {
         "com.android.art",
         "com.android.art.debug",
     ],
-    min_sdk_version: "S",
+    min_sdk_version: "S",       // 31
 }
 
 // Lazy loading version of libnativehelper that can be used by code
@@ -159,56 +159,37 @@ cc_library_static {
     },
 }
 
-//
-// NDK-only build for the target (device), using libc++.
+// NDK-only build for the target (device).
 // - Relies only on NDK exposed functionality.
 // - This doesn't include JniInvocation.
-//
-
+// - This library is less than 20 KB - it is recommended that callers link it statically.
+// - Used to link libc++ (hence the name) but no longer does.
 cc_library {
     name: "libnativehelper_compat_libc++",
     defaults: ["libnativehelper_defaults"],
-    header_libs: ["jni_headers"],
+    host_supported: true,
     cflags: ["-Werror"],
+
+    header_libs: ["jni_headers"],
     export_header_lib_headers: ["jni_headers"],
     export_include_dirs: [
         "header_only_include",
         "include",
     ],
-    host_supported: true,
     local_include_dirs: [
-        "header_only_include",
         "include_platform_header_only",
     ],
     srcs: [
         "ExpandableString.c",
         "JNIHelp.c",
     ],
+
     min_sdk_version: "29",
     sdk_version: "19",
     stl: "none",
     apex_available: [
+        "//apex_available:anyapex",
         "//apex_available:platform",
-        "com.android.art",
-        "com.android.art.debug",
-        "com.android.extservices",
-        "com.android.tethering",
-    ],
-    visibility: [
-        "//art:__subpackages__",
-        "//cts:__subpackages__",
-        "//external/perfetto:__subpackages__",
-        "//frameworks/base/packages/Connectivity/tests/integration:__pkg__",
-        "//frameworks/base/packages/ConnectivityT:__subpackages__", // TODO: remove after code move
-        "//frameworks/base/packages/Tethering:__subpackages__",
-        "//frameworks/libs/net/common/native/bpfmapjni",
-        "//frameworks/libs/net/common/native/bpfutiljni",
-        "//libcore:__subpackages__",
-        "//packages/modules/Connectivity:__subpackages__",
-        "//packages/modules/ExtServices:__subpackages__",
-        "//packages/modules/NetworkStack:__subpackages__",
-        "//packages/modules/Permission/tests/cts:__subpackages__",
-        ":__subpackages__",
     ],
 }
 
