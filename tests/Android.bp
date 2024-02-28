@@ -1,6 +1,7 @@
 // Build the unit tests.
 
 package {
+    default_team: "trendy_team_art_mainline",
     // http://go/android-license-faq
     // A large-scale-change added 'default_applicable_licenses' to import
     // the below license kinds from "libnativehelper_license":
