@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-#include "libnativehelper_test.h"
+package com.android.art.libnativehelper;
 
-#include "nativetesthelper_jni/utils.h"
+import com.android.gtestrunner.GtestRunner;
+import com.android.gtestrunner.TargetLibrary;
 
-void LibnativehelperTest::SetUp() {
-    int result = GetJavaVM()->GetEnv(reinterpret_cast<void**>(&mEnv), JNI_VERSION_1_6);
-    EXPECT_EQ(JNI_OK, result);
-    EXPECT_NE(nullptr, mEnv);
-}
+import org.junit.runner.RunWith;
 
-void LibnativehelperTest::TearDown() {
-    mEnv = nullptr;
-}
+@RunWith(GtestRunner.class)
+@TargetLibrary("nativehelper_internal_tests_jni")
+public class LibnativehelperInternalTests {}
