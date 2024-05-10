@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-#include "libnativehelper_test.h"
+#pragma once
 
-#include "nativetesthelper_jni/utils.h"
-
-void LibnativehelperTest::SetUp() {
-    int result = GetJavaVM()->GetEnv(reinterpret_cast<void**>(&mEnv), JNI_VERSION_1_6);
-    EXPECT_EQ(JNI_OK, result);
-    EXPECT_NE(nullptr, mEnv);
-}
-
-void LibnativehelperTest::TearDown() {
-    mEnv = nullptr;
-}
+#include <nativehelper/utils.h>
