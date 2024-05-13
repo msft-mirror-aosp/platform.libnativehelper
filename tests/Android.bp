@@ -97,7 +97,6 @@ cc_test {
 cc_test {
     name: "libnativehelper_internal_tests",
     defaults: [
-        "art_module_source_build_defaults",
         "libnativehelper_unit_test_defaults",
     ],
     srcs: [
@@ -112,7 +111,6 @@ cc_library {
     name: "libnativehelper_internal_tests_jni",
     defaults: [
         "libnativehelper_common_test_defaults",
-        "art_module_source_build_defaults",
     ],
     host_supported: false,
     srcs: [
@@ -131,9 +129,6 @@ cc_library {
 
 android_test {
     name: "LibnativehelperInternalTestCases",
-    defaults: [
-        "art_module_source_build_java_defaults",
-    ],
     srcs: [
         "src/**/*.java",
     ],
