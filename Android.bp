@@ -102,19 +102,18 @@ cc_library_headers {
     min_sdk_version: "S", // 31
 }
 
-cc_library_shared {
-    name: "libnativehelper",
+// This library contains code that is compatible with
+// both ART and JVM. All code specific to ART should go
+// inside libnativehelper directly.
+cc_library_static {
+    name: "libnativehelper_any_vm",
     defaults: ["libnativehelper_defaults"],
-    bootstrap: false,
     host_supported: true,
     srcs: [
         "DlHelp.c",
         "ExpandableString.c",
         "JNIHelp.c",
-        "JNIPlatformHelp.c",
-        "JniConstants.c",
         "JniInvocation.c",
-        "file_descriptor_jni.c",
     ],
     export_include_dirs: [
         "header_only_include",
@@ -123,6 +122,32 @@ cc_library_shared {
         "include_platform",
         "include_platform_header_only",
     ],
+    visibility: ["//frameworks/base/libs/nativehelper_jvm"],
+    stl: "none",
+    apex_available: [
+        "com.android.art",
+        "com.android.art.debug",
+    ],
+    min_sdk_version: "S", // 31
+    target: {
+        windows: {
+            enabled: true,
+        },
+    },
+}
+
+cc_library_shared {
+    name: "libnativehelper",
+    defaults: ["libnativehelper_defaults"],
+    bootstrap: false,
+    host_supported: true,
+    srcs: [
+        "JNIPlatformHelp.c",
+        "JniConstants.c",
+        "file_descriptor_jni.c",
+    ],
+    whole_static_libs: ["libnativehelper_any_vm"],
+    export_static_lib_headers: ["libnativehelper_any_vm"],
     stl: "none",
     stubs: {
         symbol_file: "libnativehelper.map.txt",
