@@ -32,3 +32,18 @@ void TestCompilationRW(JNIEnv* env, jintArray array) {
     sba.size();
     sba[3] = 3;
 }
+
+void TestCompilationCriticalRO(JNIEnv* env, jfloatArray array) {
+    ScopedFloatCriticalArrayRO sfa(env, array);
+    sfa.reset(nullptr);
+    sfa.get();
+    sfa.size();
+}
+
+void TestCompilationCriticalRW(JNIEnv* env, jdoubleArray array) {
+    ScopedDoubleCriticalArrayRW sda(env, array);
+    sda.reset(nullptr);
+    sda.get();
+    sda.size();
+    sda[3] = 3.0;
+}
