@@ -1102,8 +1102,13 @@ jint JNI_GetDefaultJavaVMInitArgs(void*);
 jint JNI_CreateJavaVM(JavaVM**, JNIEnv**, void*);
 jint JNI_GetCreatedJavaVMs(JavaVM**, jsize, jsize*);
 
+#ifdef _WIN32
+#define JNIIMPORT  __declspec(dllimport)
+#define JNIEXPORT  __declspec(dllexport)
+#else
 #define JNIIMPORT
 #define JNIEXPORT  __attribute__ ((visibility ("default")))
+#endif
 #define JNICALL
 
 /*

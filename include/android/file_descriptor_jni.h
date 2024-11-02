@@ -49,7 +49,7 @@ __BEGIN_DECLS
  * \param env a pointer to the JNI Native Interface of the current thread.
  * \return a java.io.FileDescriptor on success, nullptr if insufficient heap memory is available.
  */
-jobject AFileDescriptor_create(JNIEnv* env) __INTRODUCED_IN(31);
+JNIEXPORT jobject AFileDescriptor_create(JNIEnv* env) __INTRODUCED_IN(31);
 
 /**
  * Returns the Unix file descriptor represented by the given java.io.FileDescriptor.
@@ -64,7 +64,7 @@ jobject AFileDescriptor_create(JNIEnv* env) __INTRODUCED_IN(31);
  * \param fileDescriptor a java.io.FileDescriptor instance.
  * \return the Unix file descriptor wrapped by \a fileDescriptor.
  */
-int AFileDescriptor_getFd(JNIEnv* env, jobject fileDescriptor) __INTRODUCED_IN(31);
+JNIEXPORT int AFileDescriptor_getFd(JNIEnv* env, jobject fileDescriptor) __INTRODUCED_IN(31);
 
 /**
  * Sets the Unix file descriptor represented by the given java.io.FileDescriptor.
@@ -81,7 +81,7 @@ int AFileDescriptor_getFd(JNIEnv* env, jobject fileDescriptor) __INTRODUCED_IN(3
  * \param fileDescriptor a java.io.FileDescriptor instance.
  * \param fd a Unix file descriptor that \a fileDescriptor will subsequently represent.
  */
-void AFileDescriptor_setFd(JNIEnv* env, jobject fileDescriptor, int fd) __INTRODUCED_IN(31);
+JNIEXPORT void AFileDescriptor_setFd(JNIEnv* env, jobject fileDescriptor, int fd) __INTRODUCED_IN(31);
 
 __END_DECLS
 
