@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <jni.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -64,8 +65,18 @@ static struct JniInvocationImpl g_impl;
 
 #define UNUSED(x) (x) = (x)
 
+static bool RunningOnVM() {
+  const char* on_vm = getenv("ART_TEST_ON_VM");
+  return on_vm != NULL && strcmp("true", on_vm) == 0;
+}
+
 static bool IsDebuggable() {
 #ifdef __ANDROID__
+  if (RunningOnVM()) {
+    // VM environment is always treated as debuggable, as it has no system properties to query.
+    return true;
+  }
+
   char debuggable[PROP_VALUE_MAX] = {0};
   __system_property_get("ro.debuggable", debuggable);
   return strcmp(debuggable, "1") == 0;
